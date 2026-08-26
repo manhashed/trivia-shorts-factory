@@ -108,7 +108,7 @@ class PoemService:
 
         # Generate ASS Subtitle File
         ass_path = work_dir / "karaoke.ass"
-        create_ass_file(lines_timing, str(ass_path))
+        create_ass_file(lines_timing, str(ass_path), style=config.karaoke_style)
 
         tts_duration = current_time
         # Add 1.5s outro pause for music tail
