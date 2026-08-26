@@ -7,7 +7,12 @@ from typing import Dict, Any, List, Optional
 import textwrap
 
 from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, settings
-from backend.app.services.vfx_helpers import build_cinematic_bg_filter, build_overshoot_y_expr
+from backend.app.services.vfx_helpers import (
+    build_cinematic_bg_filter,
+    build_overshoot_y_expr,
+    build_countdown_tick_pulse,
+    build_flash_overlay,
+)
 from backend.app.models.schemas import VideoRenderConfig
 from backend.app.utils.ffmpeg_check import get_ffmpeg_binary, probe_media_file
 from backend.app.utils.generate_confetti import ensure_confetti_assets
@@ -415,7 +420,6 @@ class VideoService:
             b2_y, n2_y = str(badge_base_y), str(num_base_y)
             b1_y, n1_y = str(badge_base_y), str(num_base_y)
 
-        # Badge 3
         filter_chains.append(
             f"[{options_layer}][7:v]overlay=x=390:y='{b3_y}':enable='between(t,{t_cd_start},{t_cd_3_end})'[with_badge_3]"
         )
@@ -423,23 +427,44 @@ class VideoService:
             f"[with_badge_3]drawtext=fontfile='{font_path}':text='3':fontcolor=white:fontsize=170:"
             f"x=(w-text_w)/2:y='{n3_y}':borderw=8:bordercolor=0x0F172A:shadowcolor=black@0.9:shadowx=5:shadowy=5:enable='between(t,{t_cd_start},{t_cd_3_end})'[with_num_3]"
         )
-
-        # Badge 2
         filter_chains.append(
-            f"[with_num_3][8:v]overlay=x=390:y='{b2_y}':enable='between(t,{t_cd_3_end},{t_cd_2_end})'[with_badge_2]"
+            build_countdown_tick_pulse(
+                prior_layer="with_num_3", output_label="with_pulse_3",
+                x=390 - 15, y_expr=b3_y, tick_start=t_cd_start, tick_end=t_cd_3_end,
+            )
+        )
+        filter_chains.append(
+            f"[with_pulse_3][8:v]overlay=x=390:y='{b2_y}':enable='between(t,{t_cd_3_end},{t_cd_2_end})'[with_badge_2]"
         )
         filter_chains.append(
             f"[with_badge_2]drawtext=fontfile='{font_path}':text='2':fontcolor=0xFBAA19:fontsize=170:"
             f"x=(w-text_w)/2:y='{n2_y}':borderw=8:bordercolor=0x0F172A:shadowcolor=black@0.9:shadowx=5:shadowy=5:enable='between(t,{t_cd_3_end},{t_cd_2_end})'[with_num_2]"
         )
-
-        # Badge 1
         filter_chains.append(
-            f"[with_num_2][9:v]overlay=x=390:y='{b1_y}':enable='between(t,{t_cd_2_end},{t_cd_end})'[with_badge_1]"
+            build_countdown_tick_pulse(
+                prior_layer="with_num_2", output_label="with_pulse_2",
+                x=390 - 15, y_expr=b2_y, tick_start=t_cd_3_end, tick_end=t_cd_2_end,
+            )
+        )
+        filter_chains.append(
+            f"[with_pulse_2][9:v]overlay=x=390:y='{b1_y}':enable='between(t,{t_cd_2_end},{t_cd_end})'[with_badge_1]"
         )
         filter_chains.append(
             f"[with_badge_1]drawtext=fontfile='{font_path}':text='1':fontcolor=0xEF4444:fontsize=170:"
             f"x=(w-text_w)/2:y='{n1_y}':borderw=8:bordercolor=0x0F172A:shadowcolor=black@0.9:shadowx=5:shadowy=5:enable='between(t,{t_cd_2_end},{t_cd_end})'[with_num_1]"
+        )
+        filter_chains.append(
+            build_countdown_tick_pulse(
+                prior_layer="with_num_1", output_label="with_pulse_1",
+                x=390 - 15, y_expr=b1_y, tick_start=t_cd_2_end, tick_end=t_cd_end,
+            )
+        )
+        filter_chains.extend(
+            build_flash_overlay(
+                prior_layer="with_pulse_1", output_label="with_cd_flash",
+                width=config.width, height=config.height,
+                flash_time=t_cd_end, flash_dur=0.25,
+            )
         )
 
         # ── (g) Answer Card Frame & Text (Slide-in from below) ──
@@ -454,7 +479,7 @@ class VideoService:
 
         escaped_a_file = str(a_text_file).replace(":", "\\:")
         filter_chains.append(
-            f"[with_num_1][6:v]overlay=x=70:y='{a_card_y}':enable='gte(t,{t_ans_start})'[with_ans_frame]"
+            f"[with_cd_flash][6:v]overlay=x=70:y='{a_card_y}':enable='gte(t,{t_ans_start})'[with_ans_frame]"
         )
         # This renders the original free-text `answer_text` param (e.g. "A Big Spotted
         # Cow!") purely as decorative flavor -- it is NEVER the authoritative answer.

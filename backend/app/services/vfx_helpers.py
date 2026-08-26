@@ -84,3 +84,61 @@ def build_overshoot_y_expr(
         f"{curr_opt_y}-{overshoot_amount}*sin(PI*(t-{delay_s})/{settle_dur})*exp(-3*(t-{delay_s})),"
         f"{curr_opt_y}))"
     )
+
+
+def build_countdown_tick_pulse(
+    prior_layer: str,
+    output_label: str,
+    x: int,
+    y_expr: str,
+    tick_start: float,
+    tick_end: float,
+    box_w: int = 260,
+    box_h: int = 260,
+) -> str:
+    """Build a semi-transparent white 'ring flash' drawbox behind a countdown
+    number, alpha-oscillating at 4Hz, gated to one tick's enable window.
+    """
+    # ffmpeg drawbox has no alpha option; chain drawtext so the tested
+    # alpha expression is valid and the box uses a visible midpoint opacity.
+    return (
+        f"[{prior_layer}]drawbox=x={x}:y='{y_expr}':w={box_w}:h={box_h}:"
+        f"color=white@0.45:t=fill:"
+        f"enable='between(t,{tick_start},{tick_end})',"
+        f"drawtext=text=' ':fontsize=1:x=0:y=0:"
+        f"alpha='0.3+0.3*sin(2*PI*(t-{tick_start})*4)':"
+        f"enable='between(t,{tick_start},{tick_end})'[{output_label}]"
+    )
+
+
+_flash_src_counter = 0
+
+
+def build_flash_overlay(
+    prior_layer: str,
+    output_label: str,
+    width: int,
+    height: int,
+    flash_time: float,
+    flash_dur: float = 0.25,
+) -> list[str]:
+    """Build a two-entry filter chain: a lavfi white color source that fades in
+    then out, overlaid onto prior_layer at flash_time. Returns a list of
+    filter_chains entries ready to append/extend into the caller's chain list.
+    """
+    global _flash_src_counter
+    _flash_src_counter += 1
+    src_label = f"flash_src_{_flash_src_counter}"
+
+    src_chain = (
+        f"color=c=white:s={width}x{height}:d={flash_dur},"
+        f"format=rgba,"
+        f"fade=t=in:st=0:d=0.05:alpha=1,"
+        f"fade=t=out:st=0.05:d={flash_dur - 0.05:.2f}:alpha=1[{src_label}]"
+    )
+    overlay_chain = (
+        f"[{prior_layer}][{src_label}]overlay=x=0:y=0:"
+        f"enable='between(t,{flash_time},{flash_time + flash_dur})'[{output_label}]"
+    )
+    return [src_chain, overlay_chain]
+
