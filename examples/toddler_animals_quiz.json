@@ -1,0 +1,27 @@
+[
+  {
+    "q": "What color is a ripe banana?",
+    "a": "Bright Yellow!",
+    "category": "Colors & Fruits"
+  },
+  {
+    "q": "Which friendly farm animal says 'Moo'?",
+    "a": "A Big Spotted Cow!",
+    "category": "Farm Animals"
+  },
+  {
+    "q": "How many fingers do you have on one hand?",
+    "a": "Five Fingers!",
+    "category": "Counting"
+  },
+  {
+    "q": "What shape is a delicious slice of pizza pie?",
+    "a": "A Triangle!",
+    "category": "Shapes"
+  },
+  {
+    "q": "What cute animal hops around and loves crunchy carrots?",
+    "a": "A Fluffy Bunny Rabbit!",
+    "category": "Animals"
+  }
+]

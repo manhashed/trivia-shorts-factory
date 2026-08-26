@@ -1,0 +1,711 @@
+[
+  {
+    "id": "anim_001",
+    "category": "Animals & Sounds",
+    "q": "Which friendly farm animal says 'Moo'?",
+    "a": "A Big Spotted Cow!",
+    "options": ["A Cow", "A Dog", "A Frog"]
+  },
+  {
+    "id": "anim_002",
+    "category": "Animals & Sounds",
+    "q": "What cute animal says 'Quack Quack' and loves to swim in the pond?",
+    "a": "A Yellow Duckling!",
+    "options": ["A Duck", "A Cat", "A Lion"]
+  },
+  {
+    "id": "anim_003",
+    "category": "Animals & Sounds",
+    "q": "Which playful pet says 'Woof Woof' and wags its tail?",
+    "a": "A Happy Puppy Dog!",
+    "options": ["A Puppy", "A Bunny", "A Bird"]
+  },
+  {
+    "id": "anim_004",
+    "category": "Animals & Sounds",
+    "q": "What soft furry animal purrs and says 'Meow'?",
+    "a": "A Sweet Kitty Cat!",
+    "options": ["A Cat", "A Cow", "A Bear"]
+  },
+  {
+    "id": "anim_005",
+    "category": "Animals & Sounds",
+    "q": "Which wild animal has a big mane and lets out a mighty 'Roar'?",
+    "a": "The King Lion!",
+    "options": ["A Lion", "A Mouse", "A Duck"]
+  },
+  {
+    "id": "anim_006",
+    "category": "Animals & Sounds",
+    "q": "What big animal has a long trunk and huge floppy ears?",
+    "a": "A Gentle Elephant!",
+    "options": ["An Elephant", "A Monkey", "A Tiger"]
+  },
+  {
+    "id": "anim_007",
+    "category": "Animals & Sounds",
+    "q": "Which woolly animal says 'Baa Baa' in the green meadow?",
+    "a": "A Fluffy Sheep!",
+    "options": ["A Sheep", "A Horse", "A Pig"]
+  },
+  {
+    "id": "anim_008",
+    "category": "Animals & Sounds",
+    "q": "What green animal goes 'Ribbit Ribbit' and hops on lily pads?",
+    "a": "A Bouncy Frog!",
+    "options": ["A Frog", "A Duck", "A Turtle"]
+  },
+  {
+    "id": "anim_009",
+    "category": "Animals & Sounds",
+    "q": "Which wise nighttime bird stays awake and says 'Hoo Hoo'?",
+    "a": "A Night Owl!",
+    "options": ["An Owl", "A Parrot", "A Rooster"]
+  },
+  {
+    "id": "anim_010",
+    "category": "Animals & Sounds",
+    "q": "What morning bird says 'Cock-a-doodle-doo' when the sun rises?",
+    "a": "A Proud Rooster!",
+    "options": ["A Rooster", "A Penguin", "A Duck"]
+  },
+
+  {
+    "id": "col_001",
+    "category": "Colors & Rainbows",
+    "q": "What color is a delicious ripe banana?",
+    "a": "Bright Sunny Yellow!",
+    "options": ["Yellow", "Blue", "Purple"]
+  },
+  {
+    "id": "col_002",
+    "category": "Colors & Rainbows",
+    "q": "What color is the fresh green grass under our feet?",
+    "a": "Fresh Green!",
+    "options": ["Green", "Red", "Pink"]
+  },
+  {
+    "id": "col_003",
+    "category": "Colors & Rainbows",
+    "q": "What color is the clear daytime sky and the deep ocean?",
+    "a": "Sky Blue!",
+    "options": ["Blue", "Yellow", "Brown"]
+  },
+  {
+    "id": "col_004",
+    "category": "Colors & Rainbows",
+    "q": "What color is a juicy sweet strawberry or shiny fire truck?",
+    "a": "Cherry Red!",
+    "options": ["Red", "Black", "Green"]
+  },
+  {
+    "id": "col_005",
+    "category": "Colors & Rainbows",
+    "q": "What color do you get when you mix red and yellow together?",
+    "a": "Juicy Orange!",
+    "options": ["Orange", "Green", "White"]
+  },
+  {
+    "id": "col_006",
+    "category": "Colors & Rainbows",
+    "q": "What color is a sweet bunch of yummy grapes?",
+    "a": "Rich Purple!",
+    "options": ["Purple", "Yellow", "Orange"]
+  },
+  {
+    "id": "col_007",
+    "category": "Colors & Rainbows",
+    "q": "What color is cold fluffy winter snow?",
+    "a": "Pure Snow White!",
+    "options": ["White", "Black", "Green"]
+  },
+  {
+    "id": "col_008",
+    "category": "Colors & Rainbows",
+    "q": "What color is a pretty flamingo bird standing in the water?",
+    "a": "Pretty Pink!",
+    "options": ["Pink", "Blue", "Gray"]
+  },
+  {
+    "id": "col_009",
+    "category": "Colors & Rainbows",
+    "q": "What color is a chocolate teddy bear or delicious hot cocoa?",
+    "a": "Warm Chocolate Brown!",
+    "options": ["Brown", "Green", "Yellow"]
+  },
+  {
+    "id": "col_010",
+    "category": "Colors & Rainbows",
+    "q": "What beautiful arc appears in the sky after a warm rain shower?",
+    "a": "A Colorful Rainbow!",
+    "options": ["A Rainbow", "A Cloud", "A Star"]
+  },
+
+  {
+    "id": "shp_001",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape is a delicious slice of pepperoni pizza?",
+    "a": "A Triangle!",
+    "options": ["A Triangle", "A Circle", "A Square"]
+  },
+  {
+    "id": "shp_002",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape is a big bouncy basketball or full moon?",
+    "a": "A Round Circle!",
+    "options": ["A Circle", "A Star", "A Triangle"]
+  },
+  {
+    "id": "shp_003",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape has 4 equal sides like a toy building block?",
+    "a": "A Square!",
+    "options": ["A Square", "A Circle", "An Oval"]
+  },
+  {
+    "id": "shp_004",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape twinkles high up in the night sky?",
+    "a": "A Shining Star!",
+    "options": ["A Star", "A Square", "A Heart"]
+  },
+  {
+    "id": "shp_005",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape is a love card or Valentine candy?",
+    "a": "A Sweet Heart!",
+    "options": ["A Heart", "A Diamond", "A Circle"]
+  },
+  {
+    "id": "shp_006",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape looks like an egg or watermelon?",
+    "a": "An Oval!",
+    "options": ["An Oval", "A Square", "A Triangle"]
+  },
+  {
+    "id": "shp_007",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape is a bedtime storybook or picture frame?",
+    "a": "A Rectangle!",
+    "options": ["A Rectangle", "A Circle", "A Star"]
+  },
+  {
+    "id": "shp_008",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape is a diamond kite flying high in the wind?",
+    "a": "A Diamond Rhombus!",
+    "options": ["A Diamond", "A Circle", "An Oval"]
+  },
+  {
+    "id": "shp_009",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape is the bottom cone of an ice cream treat?",
+    "a": "A Cone Triangle!",
+    "options": ["A Cone", "A Box", "A Ring"]
+  },
+  {
+    "id": "shp_010",
+    "category": "Shapes & Everyday Objects",
+    "q": "What shape are the spinning wheels on the big yellow bus?",
+    "a": "Round Circles!",
+    "options": ["Circles", "Squares", "Triangles"]
+  },
+
+  {
+    "id": "cnt_001",
+    "category": "Numbers & Counting",
+    "q": "How many fingers do you have on one hand?",
+    "a": "Five Fingers!",
+    "options": ["5 Fingers", "2 Fingers", "10 Fingers"]
+  },
+  {
+    "id": "cnt_002",
+    "category": "Numbers & Counting",
+    "q": "How many eyes do we use to see the world?",
+    "a": "Two Eyes!",
+    "options": ["2 Eyes", "1 Eye", "4 Eyes"]
+  },
+  {
+    "id": "cnt_003",
+    "category": "Numbers & Counting",
+    "q": "How many legs does a cute little spider have?",
+    "a": "Eight Long Legs!",
+    "options": ["8 Legs", "4 Legs", "6 Legs"]
+  },
+  {
+    "id": "cnt_004",
+    "category": "Numbers & Counting",
+    "q": "How many wheels does a bicycle have?",
+    "a": "Two Wheels!",
+    "options": ["2 Wheels", "3 Wheels", "4 Wheels"]
+  },
+  {
+    "id": "cnt_005",
+    "category": "Numbers & Counting",
+    "q": "How many wheels does a red tricycle have?",
+    "a": "Three Wheels!",
+    "options": ["3 Wheels", "2 Wheels", "5 Wheels"]
+  },
+  {
+    "id": "cnt_006",
+    "category": "Numbers & Counting",
+    "q": "How many legs does a playful puppy dog have?",
+    "a": "Four Paws & Legs!",
+    "options": ["4 Legs", "2 Legs", "6 Legs"]
+  },
+  {
+    "id": "cnt_007",
+    "category": "Numbers & Counting",
+    "q": "How many sides does a shiny triangle have?",
+    "a": "Three Sides!",
+    "options": ["3 Sides", "4 Sides", "5 Sides"]
+  },
+  {
+    "id": "cnt_008",
+    "category": "Numbers & Counting",
+    "q": "How many toes do you have on both feet combined?",
+    "a": "Ten Little Toes!",
+    "options": ["10 Toes", "5 Toes", "20 Toes"]
+  },
+  {
+    "id": "cnt_009",
+    "category": "Numbers & Counting",
+    "q": "How many noses do you have on your smiling face?",
+    "a": "Just One Nose!",
+    "options": ["1 Nose", "2 Noses", "3 Noses"]
+  },
+  {
+    "id": "cnt_010",
+    "category": "Numbers & Counting",
+    "q": "What number comes right after one, two, three...?",
+    "a": "Number Four!",
+    "options": ["4", "5", "6"]
+  },
+
+  {
+    "id": "fod_001",
+    "category": "Fruits & Veggies",
+    "q": "What crunchy orange vegetable does a bunny rabbit love to eat?",
+    "a": "A Crunchy Carrot!",
+    "options": ["A Carrot", "A Potato", "An Onion"]
+  },
+  {
+    "id": "fod_002",
+    "category": "Fruits & Veggies",
+    "q": "What big green fruit has sweet pink fruit and black seeds inside?",
+    "a": "Juicy Watermelon!",
+    "options": ["Watermelon", "Apple", "Lemon"]
+  },
+  {
+    "id": "fod_003",
+    "category": "Fruits & Veggies",
+    "q": "What yellow fruit is sour and makes your mouth pucker?",
+    "a": "A Sour Yellow Lemon!",
+    "options": ["A Lemon", "A Banana", "An Orange"]
+  },
+  {
+    "id": "fod_004",
+    "category": "Fruits & Veggies",
+    "q": "Which fruit grows in bunches and monkeys love to peel?",
+    "a": "A Sweet Banana!",
+    "options": ["A Banana", "An Apple", "A Pear"]
+  },
+  {
+    "id": "fod_005",
+    "category": "Fruits & Veggies",
+    "q": "What round red fruit grows on big trees in the orchard?",
+    "a": "A Crisp Red Apple!",
+    "options": ["An Apple", "A Grape", "A Blueberry"]
+  },
+  {
+    "id": "fod_006",
+    "category": "Fruits & Veggies",
+    "q": "What small round blue berries are delicious in morning pancakes?",
+    "a": "Sweet Blueberries!",
+    "options": ["Blueberries", "Cherries", "Oranges"]
+  },
+  {
+    "id": "fod_007",
+    "category": "Fruits & Veggies",
+    "q": "What yellow vegetable has crunchy kernels on a cob?",
+    "a": "Sweet Corn on the Cob!",
+    "options": ["Corn", "Broccoli", "Tomato"]
+  },
+  {
+    "id": "fod_008",
+    "category": "Fruits & Veggies",
+    "q": "What healthy green veggie looks like tiny little miniature trees?",
+    "a": "Nutritious Broccoli!",
+    "options": ["Broccoli", "Carrot", "Eggplant"]
+  },
+  {
+    "id": "fod_009",
+    "category": "Fruits & Veggies",
+    "q": "What sweet dairy treat is cold, creamy, and served on a cone?",
+    "a": "Yummy Ice Cream!",
+    "options": ["Ice Cream", "Soup", "Toast"]
+  },
+  {
+    "id": "fod_010",
+    "category": "Fruits & Veggies",
+    "q": "What warm healthy drink do friendly cows give us?",
+    "a": "Fresh White Milk!",
+    "options": ["Milk", "Juice", "Soda"]
+  },
+
+  {
+    "id": "veh_001",
+    "category": "Vehicles & Things That Go",
+    "q": "What big red truck has flashing lights and a loud siren?",
+    "a": "A Brave Fire Truck!",
+    "options": ["A Fire Truck", "A Bicycle", "A Rowboat"]
+  },
+  {
+    "id": "veh_002",
+    "category": "Vehicles & Things That Go",
+    "q": "What vehicle has wings and flies high above the white clouds?",
+    "a": "An Airplane!",
+    "options": ["An Airplane", "A Bus", "A Scooter"]
+  },
+  {
+    "id": "veh_003",
+    "category": "Vehicles & Things That Go",
+    "q": "What long vehicle travels on railroad tracks and says 'Choo Choo'?",
+    "a": "A Speedy Train!",
+    "options": ["A Train", "A Car", "A Boat"]
+  },
+  {
+    "id": "veh_004",
+    "category": "Vehicles & Things That Go",
+    "q": "What big yellow vehicle takes smiling kids to preschool school?",
+    "a": "The Yellow School Bus!",
+    "options": ["A School Bus", "A Canoe", "A Truck"]
+  },
+  {
+    "id": "veh_005",
+    "category": "Vehicles & Things That Go",
+    "q": "What vessel has spinning blades on top and can hover in the air?",
+    "a": "A Cool Helicopter!",
+    "options": ["A Helicopter", "A Jet", "A Motorcycle"]
+  },
+  {
+    "id": "veh_006",
+    "category": "Vehicles & Things That Go",
+    "q": "What vehicle dives deep underwater to explore fish and sea life?",
+    "a": "A Submarine!",
+    "options": ["A Submarine", "A Sailboat", "A Glider"]
+  },
+  {
+    "id": "veh_007",
+    "category": "Vehicles & Things That Go",
+    "q": "What tall spaceship blasts off with fire and travels to outer space?",
+    "a": "A Space Rocket!",
+    "options": ["A Rocket", "A Van", "A Cart"]
+  },
+  {
+    "id": "veh_008",
+    "category": "Vehicles & Things That Go",
+    "q": "What floating boat uses the ocean wind to glide with big white sails?",
+    "a": "A Beautiful Sailboat!",
+    "options": ["A Sailboat", "A Tractor", "A Train"]
+  },
+  {
+    "id": "veh_009",
+    "category": "Vehicles & Things That Go",
+    "q": "What big green vehicle helps farmers plow crops in the dirt fields?",
+    "a": "A Sturdy Farm Tractor!",
+    "options": ["A Tractor", "A Taxi", "A Racecar"]
+  },
+  {
+    "id": "veh_010",
+    "category": "Vehicles & Things That Go",
+    "q": "What fast vehicle with 4 wheels zooms around the racetrack?",
+    "a": "A Speedy Race Car!",
+    "options": ["A Race Car", "A Wagon", "A Sled"]
+  },
+
+  {
+    "id": "nat_001",
+    "category": "Nature & Space",
+    "q": "What bright star warms our planet and lights up the daytime?",
+    "a": "The Golden Sun!",
+    "options": ["The Sun", "The Moon", "A Cloud"]
+  },
+  {
+    "id": "nat_002",
+    "category": "Nature & Space",
+    "q": "What glows in the night sky and changes shapes from crescent to full?",
+    "a": "The Silver Moon!",
+    "options": ["The Moon", "The Sun", "A Plane"]
+  },
+  {
+    "id": "nat_003",
+    "category": "Nature & Space",
+    "q": "What falls from fluffy gray clouds to water plants and flowers?",
+    "a": "Gentle Raindrops!",
+    "options": ["Rain", "Snow", "Leaves"]
+  },
+  {
+    "id": "nat_004",
+    "category": "Nature & Space",
+    "q": "What cold white flakes fall from the winter sky to build snowmen?",
+    "a": "Sparkling Snowflakes!",
+    "options": ["Snow", "Sand", "Grass"]
+  },
+  {
+    "id": "nat_005",
+    "category": "Nature & Space",
+    "q": "What tall plant has a brown wooden trunk and green leaves?",
+    "a": "A Big Shady Tree!",
+    "options": ["A Tree", "A Flower", "A Mushroom"]
+  },
+  {
+    "id": "nat_006",
+    "category": "Nature & Space",
+    "q": "What colorful fragrant plants bloom in spring with pretty petals?",
+    "a": "Blooming Flowers!",
+    "options": ["Flowers", "Rocks", "Clouds"]
+  },
+  {
+    "id": "nat_007",
+    "category": "Nature & Space",
+    "q": "What giant body of salty blue water is home to whales and dolphins?",
+    "a": "The Vast Ocean!",
+    "options": ["The Ocean", "A Puddle", "A Bathtub"]
+  },
+  {
+    "id": "nat_008",
+    "category": "Nature & Space",
+    "q": "What invisible force blows through our hair and spins windmills?",
+    "a": "The Gentle Wind!",
+    "options": ["The Wind", "The Rain", "The Sunshine"]
+  },
+  {
+    "id": "nat_009",
+    "category": "Nature & Space",
+    "q": "What giant ball of sand and water do we live on?",
+    "a": "Planet Earth!",
+    "options": ["Planet Earth", "Mars", "The Moon"]
+  },
+  {
+    "id": "nat_010",
+    "category": "Nature & Space",
+    "q": "What colorful leaves fall to the ground during chilly Autumn?",
+    "a": "Red & Orange Autumn Leaves!",
+    "options": ["Autumn Leaves", "Snowflakes", "Grass"]
+  },
+
+  {
+    "id": "bod_001",
+    "category": "My Body & Health",
+    "q": "What two body parts do we use to listen to music and stories?",
+    "a": "Our Two Ears!",
+    "options": ["Our Ears", "Our Eyes", "Our Elbows"]
+  },
+  {
+    "id": "bod_002",
+    "category": "My Body & Health",
+    "q": "What body part do we use to smell sweet flowers and freshly baked cookies?",
+    "a": "Our Cute Nose!",
+    "options": ["Our Nose", "Our Mouth", "Our Feet"]
+  },
+  {
+    "id": "bod_003",
+    "category": "My Body & Health",
+    "q": "What two body parts do we use to jump, run, and dance around?",
+    "a": "Our Strong Legs & Feet!",
+    "options": ["Our Legs & Feet", "Our Hands", "Our Ears"]
+  },
+  {
+    "id": "bod_004",
+    "category": "My Body & Health",
+    "q": "What two things do we clap together when we are happy and we know it?",
+    "a": "Our Two Hands!",
+    "options": ["Our Hands", "Our Knees", "Our Shoulders"]
+  },
+  {
+    "id": "bod_005",
+    "category": "My Body & Health",
+    "q": "What white pearly things inside our mouth do we brush every morning and night?",
+    "a": "Our Shiny Teeth!",
+    "options": ["Our Teeth", "Our Tongue", "Our Cheeks"]
+  },
+  {
+    "id": "bod_006",
+    "category": "My Body & Health",
+    "q": "What warm body part goes 'thump-thump' inside our chest?",
+    "a": "Our Beating Heart!",
+    "options": ["Our Heart", "Our Brain", "Our Tummy"]
+  },
+  {
+    "id": "bod_007",
+    "category": "My Body & Health",
+    "q": "What do we wear on our feet before putting on our shoes?",
+    "a": "Cozy Warm Socks!",
+    "options": ["Socks", "Gloves", "Hats"]
+  },
+  {
+    "id": "bod_008",
+    "category": "My Body & Health",
+    "q": "What do we do with our arms to show our friends and family love?",
+    "a": "Give a Big Warm Hug!",
+    "options": ["Give a Hug", "Wave Bye", "Jump High"]
+  },
+  {
+    "id": "bod_009",
+    "category": "My Body & Health",
+    "q": "What facial expression do we make when we are feeling super happy?",
+    "a": "A Big Cheerful Smile!",
+    "options": ["A Big Smile", "A Frown", "A Yawn"]
+  },
+  {
+    "id": "bod_010",
+    "category": "My Body & Health",
+    "q": "What do we do in our cozy bed every night to dream and recharge?",
+    "a": "Get Sweet Sleep!",
+    "options": ["Sleep", "Run", "Eat"]
+  },
+
+  {
+    "id": "hlp_001",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who takes care of us and helps us feel better when we are sick?",
+    "a": "A Kind Doctor & Nurse!",
+    "options": ["A Doctor", "A Pilot", "A Chef"]
+  },
+  {
+    "id": "hlp_002",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who puts out big fires and rescues kittens with a tall ladder truck?",
+    "a": "A Brave Firefighter!",
+    "options": ["A Firefighter", "A Baker", "A Farmer"]
+  },
+  {
+    "id": "hlp_003",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who teaches us reading, counting, and fun songs in the classroom?",
+    "a": "Our Wonderful Teacher!",
+    "options": ["A Teacher", "A Sailor", "A Mechanic"]
+  },
+  {
+    "id": "hlp_004",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who bakes warm bread, delicious cookies, and birthday cakes?",
+    "a": "A Friendly Baker!",
+    "options": ["A Baker", "A Dentist", "A Plumber"]
+  },
+  {
+    "id": "hlp_005",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who travels in a rocket to explore the moon and sparkling stars?",
+    "a": "A Space Astronaut!",
+    "options": ["An Astronaut", "A Bus Driver", "A Painter"]
+  },
+  {
+    "id": "hlp_006",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who delivers letters and fun packages right to our front mailbox?",
+    "a": "A Mail Carrier!",
+    "options": ["A Mail Carrier", "A Carpenter", "A Doctor"]
+  },
+  {
+    "id": "hlp_007",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who checks our smiling teeth and teaches us how to brush properly?",
+    "a": "A Gentle Dentist!",
+    "options": ["A Dentist", "A Vet", "A Chef"]
+  },
+  {
+    "id": "hlp_008",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who cares for sick puppies, kittens, and bunny rabbits?",
+    "a": "An Animal Veterinarian (Vet)!",
+    "options": ["A Vet", "A Police Officer", "A Pilot"]
+  },
+  {
+    "id": "hlp_009",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who flies big passenger airplanes across the sky from city to city?",
+    "a": "An Airplane Pilot!",
+    "options": ["A Pilot", "A Driver", "A Train Engineer"]
+  },
+  {
+    "id": "hlp_010",
+    "category": "Friendly Helpers & Jobs",
+    "q": "Who plants yummy vegetables and cares for barn animals on the farm?",
+    "a": "A Hardworking Farmer!",
+    "options": ["A Farmer", "A Librarian", "A Banker"]
+  },
+
+  {
+    "id": "opp_001",
+    "category": "Opposites & Daily Fun",
+    "q": "What is the opposite of HOT like summer sunshine?",
+    "a": "COLD like Winter Ice!",
+    "options": ["Cold", "Warm", "Dry"]
+  },
+  {
+    "id": "opp_002",
+    "category": "Opposites & Daily Fun",
+    "q": "An elephant is BIG. What is a tiny little mouse?",
+    "a": "TINY and SMALL!",
+    "options": ["Small", "Huge", "Heavy"]
+  },
+  {
+    "id": "opp_003",
+    "category": "Opposites & Daily Fun",
+    "q": "What is the opposite of DAY when the moon and stars come out?",
+    "a": "Cozy NIGHT!",
+    "options": ["Night", "Morning", "Afternoon"]
+  },
+  {
+    "id": "opp_004",
+    "category": "Opposites & Daily Fun",
+    "q": "A turtle walks SLOW. What does a cheetah run?",
+    "a": "Super FAST!",
+    "options": ["Fast", "Slow", "Quiet"]
+  },
+  {
+    "id": "opp_005",
+    "category": "Opposites & Daily Fun",
+    "q": "What is the opposite of UP in the sky?",
+    "a": "DOWN on the ground!",
+    "options": ["Down", "Left", "Right"]
+  },
+  {
+    "id": "opp_006",
+    "category": "Opposites & Daily Fun",
+    "q": "When we are joyful we are HAPPY. What is the opposite of happy?",
+    "a": "SAD with a frown!",
+    "options": ["Sad", "Excited", "Sleepy"]
+  },
+  {
+    "id": "opp_007",
+    "category": "Opposites & Daily Fun",
+    "q": "What is the opposite of OPEN like a toy box?",
+    "a": "CLOSED shut tight!",
+    "options": ["Closed", "High", "Wide"]
+  },
+  {
+    "id": "opp_008",
+    "category": "Opposites & Daily Fun",
+    "q": "A heavy rock is HARD. What is a fluffy teddy bear?",
+    "a": "Cuddly and SOFT!",
+    "options": ["Soft", "Hard", "Sharp"]
+  },
+  {
+    "id": "opp_009",
+    "category": "Opposites & Daily Fun",
+    "q": "What is the opposite of IN the cozy house?",
+    "a": "OUT in the yard!",
+    "options": ["Out", "Under", "Behind"]
+  },
+  {
+    "id": "opp_010",
+    "category": "Opposites & Daily Fun",
+    "q": "When water splashes on us we get WET. What do towels make us?",
+    "a": "Clean and DRY!",
+    "options": ["Dry", "Wet", "Cold"]
+  }
+]

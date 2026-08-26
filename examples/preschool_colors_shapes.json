@@ -1,0 +1,22 @@
+[
+  {
+    "q": "What color is the bright sun in the morning sky?",
+    "a": "Golden Yellow!",
+    "category": "Nature"
+  },
+  {
+    "q": "What shape is a big bouncy basketball?",
+    "a": "A Round Sphere Circle!",
+    "category": "Shapes"
+  },
+  {
+    "q": "What color do you get if you mix red and yellow paint?",
+    "a": "Juicy Orange!",
+    "category": "Colors"
+  },
+  {
+    "q": "Which little animal buzzes around flowers making sweet honey?",
+    "a": "A Busy Bumblebee!",
+    "category": "Bugs & Insects"
+  }
+]

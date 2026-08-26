@@ -1,0 +1,353 @@
+[
+  {
+    "id": "poem_01",
+    "title": "Twinkle, Twinkle, Little Star",
+    "category": "Classic Lullabies",
+    "theme": "space_galaxy",
+    "mascot": "bear",
+    "melody": "twinkle_star",
+    "lines": [
+      "Twinkle, twinkle, little star,",
+      "How I wonder what you are!",
+      "Up above the world so high,",
+      "Like a diamond in the sky!"
+    ]
+  },
+  {
+    "id": "poem_02",
+    "title": "The Wheels on the Bus",
+    "category": "Action Songs",
+    "theme": "arcade_retro",
+    "mascot": "lion",
+    "melody": "bouncy_march",
+    "lines": [
+      "The wheels on the bus go round and round,",
+      "Round and round, all through the town!",
+      "The wipers on the bus go swish, swish, swish,",
+      "All day long, swish, swish, swish!"
+    ]
+  },
+  {
+    "id": "poem_03",
+    "title": "Itsy Bitsy Spider",
+    "category": "Fun Animals",
+    "theme": "safari_jungle",
+    "mascot": "bunny",
+    "melody": "playful_ukulele",
+    "lines": [
+      "The itsy bitsy spider climbed up the water spout,",
+      "Down came the rain and washed the spider out!",
+      "Out came the sun and dried up all the rain,",
+      "And the itsy bitsy spider climbed up the spout again!"
+    ]
+  },
+  {
+    "id": "poem_04",
+    "title": "Baa, Baa, Black Sheep",
+    "category": "Farm Animals",
+    "theme": "candy_clouds",
+    "mascot": "penguin",
+    "melody": "twinkle_star",
+    "lines": [
+      "Baa, baa, black sheep, have you any wool?",
+      "Yes, sir, yes, sir, three bags full!",
+      "One for the master, and one for the dame,",
+      "And one for the little boy who lives down the lane!"
+    ]
+  },
+  {
+    "id": "poem_05",
+    "title": "Humpty Dumpty",
+    "category": "Classic Rhymes",
+    "theme": "arcade_retro",
+    "mascot": "bear",
+    "melody": "storybook_bells",
+    "lines": [
+      "Humpty Dumpty sat on a wall,",
+      "Humpty Dumpty had a great fall!",
+      "All the king's horses and all the king's men,",
+      "Couldn't put Humpty together again!"
+    ]
+  },
+  {
+    "id": "poem_06",
+    "title": "Row, Row, Row Your Boat",
+    "category": "Water & Adventure",
+    "theme": "ocean_bubbles",
+    "mascot": "penguin",
+    "melody": "playful_ukulele",
+    "lines": [
+      "Row, row, row your boat gently down the stream,",
+      "Merrily, merrily, merrily, merrily, life is but a dream!",
+      "Row, row, row your boat gently down the brook,",
+      "If you see a little frog, don't forget to look!"
+    ]
+  },
+  {
+    "id": "poem_07",
+    "title": "Five Little Ducks",
+    "category": "Counting Rhymes",
+    "theme": "ocean_bubbles",
+    "mascot": "bunny",
+    "melody": "bouncy_march",
+    "lines": [
+      "Five little ducks went out one day,",
+      "Over the hill and far away!",
+      "Mother duck said, 'Quack, quack, quack, quack!',",
+      "And four little ducks came swimming back!"
+    ]
+  },
+  {
+    "id": "poem_08",
+    "title": "Hickory Dickory Dock",
+    "category": "Counting Rhymes",
+    "theme": "safari_jungle",
+    "mascot": "lion",
+    "melody": "storybook_bells",
+    "lines": [
+      "Hickory, dickory, dock,",
+      "The mouse ran up the clock!",
+      "The clock struck one, the mouse ran down,",
+      "Hickory, dickory, dock!"
+    ]
+  },
+  {
+    "id": "poem_09",
+    "title": "If You're Happy and You Know It",
+    "category": "Action Songs",
+    "theme": "candy_clouds",
+    "mascot": "bear",
+    "melody": "bouncy_march",
+    "lines": [
+      "If you're happy and you know it, clap your hands! (Clap, clap!)",
+      "If you're happy and you know it, clap your hands! (Clap, clap!)",
+      "If you're happy and you know it, and you really want to show it,",
+      "If you're happy and you know it, clap your hands! (Clap, clap!)"
+    ]
+  },
+  {
+    "id": "poem_10",
+    "title": "Rain, Rain, Go Away",
+    "category": "Weather & Nature",
+    "theme": "ocean_bubbles",
+    "mascot": "bunny",
+    "melody": "playful_ukulele",
+    "lines": [
+      "Rain, rain, go away,",
+      "Come again another day!",
+      "Little children want to play,",
+      "Rain, rain, go away!"
+    ]
+  },
+  {
+    "id": "poem_11",
+    "title": "One, Two, Buckle My Shoe",
+    "category": "Counting Rhymes",
+    "theme": "arcade_retro",
+    "mascot": "penguin",
+    "melody": "bouncy_march",
+    "lines": [
+      "One, two, buckle my shoe,",
+      "Three, four, shut the door!",
+      "Five, six, pick up sticks,",
+      "Seven, eight, lay them straight!",
+      "Nine, ten, a big fat hen!"
+    ]
+  },
+  {
+    "id": "poem_12",
+    "title": "Old MacDonald Had a Farm",
+    "category": "Farm Animals",
+    "theme": "safari_jungle",
+    "mascot": "lion",
+    "melody": "bouncy_march",
+    "lines": [
+      "Old MacDonald had a farm, E-I-E-I-O!",
+      "And on that farm he had a cow, E-I-E-I-O!",
+      "With a moo-moo here, and a moo-moo there,",
+      "Everywhere a moo-moo, Old MacDonald had a farm!"
+    ]
+  },
+  {
+    "id": "poem_13",
+    "title": "Mary Had a Little Lamb",
+    "category": "Fun Animals",
+    "theme": "candy_clouds",
+    "mascot": "bunny",
+    "melody": "twinkle_star",
+    "lines": [
+      "Mary had a little lamb, little lamb, little lamb,",
+      "Mary had a little lamb, its fleece was white as snow!",
+      "And everywhere that Mary went, Mary went, Mary went,",
+      "Everywhere that Mary went, the lamb was sure to go!"
+    ]
+  },
+  {
+    "id": "poem_14",
+    "title": "Brush Your Teeth Song",
+    "category": "Healthy Habits",
+    "theme": "ocean_bubbles",
+    "mascot": "bear",
+    "melody": "playful_ukulele",
+    "lines": [
+      "Brush, brush, brush your teeth, brush them every day!",
+      "Up and down and round and round, keep the germs away!",
+      "Morning time and night time too, sparkling bright and clean,",
+      "The happiest, brightest smile you have ever seen!"
+    ]
+  },
+  {
+    "id": "poem_15",
+    "title": "Rainbow Colors in the Sky",
+    "category": "Colors & Learning",
+    "theme": "candy_clouds",
+    "mascot": "bunny",
+    "melody": "storybook_bells",
+    "lines": [
+      "Red and orange, yellow and green,",
+      "The prettiest colors you've ever seen!",
+      "Blue and purple shining bright,",
+      "A rainbow glowing in the light!"
+    ]
+  },
+  {
+    "id": "poem_16",
+    "title": "Five Little Monkeys",
+    "category": "Action Songs",
+    "theme": "safari_jungle",
+    "mascot": "lion",
+    "melody": "bouncy_march",
+    "lines": [
+      "Five little monkeys jumping on the bed,",
+      "One fell off and bumped his head!",
+      "Mama called the doctor and the doctor said,",
+      "'No more monkeys jumping on the bed!'"
+    ]
+  },
+  {
+    "id": "poem_17",
+    "title": "Clean Up, Clean Up Song",
+    "category": "Healthy Habits",
+    "theme": "candy_clouds",
+    "mascot": "penguin",
+    "melody": "playful_ukulele",
+    "lines": [
+      "Clean up, clean up, everybody everywhere!",
+      "Clean up, clean up, everybody do your share!",
+      "Put the toys into the box, put the books away,",
+      "Now our room is shining clean, ready for next day!"
+    ]
+  },
+  {
+    "id": "poem_18",
+    "title": "Zoom, Zoom, Zoom, We're Going to the Moon",
+    "category": "Space & Wonder",
+    "theme": "space_galaxy",
+    "mascot": "bear",
+    "melody": "bouncy_march",
+    "lines": [
+      "Zoom, zoom, zoom, we're going to the moon!",
+      "Zoom, zoom, zoom, we'll be there very soon!",
+      "Five, four, three, two, one... BLAST OFF!",
+      "Flying past the shining stars, having so much fun!"
+    ]
+  },
+  {
+    "id": "poem_19",
+    "title": "Little Green Frog",
+    "category": "Fun Animals",
+    "theme": "safari_jungle",
+    "mascot": "bunny",
+    "melody": "playful_ukulele",
+    "lines": [
+      "Gung gung went the little green frog one day,",
+      "Gung gung went the little green frog!",
+      "He jumped in the water and swam away,",
+      "Ribbit, ribbit, ribbit all the happy day!"
+    ]
+  },
+  {
+    "id": "poem_20",
+    "title": "I'm a Little Teapot",
+    "category": "Classic Rhymes",
+    "theme": "candy_clouds",
+    "mascot": "penguin",
+    "melody": "storybook_bells",
+    "lines": [
+      "I'm a little teapot, short and stout,",
+      "Here is my handle, here is my spout!",
+      "When I get all steamed up, hear me shout,",
+      "Tip me over and pour me out!"
+    ]
+  },
+  {
+    "id": "poem_21",
+    "title": "Teddy Bear, Teddy Bear, Turn Around",
+    "category": "Action Songs",
+    "theme": "candy_clouds",
+    "mascot": "bear",
+    "melody": "twinkle_star",
+    "lines": [
+      "Teddy bear, teddy bear, turn around,",
+      "Teddy bear, teddy bear, touch the ground!",
+      "Teddy bear, teddy bear, reach up high,",
+      "Teddy bear, teddy bear, wave goodbye!"
+    ]
+  },
+  {
+    "id": "poem_22",
+    "title": "Apples and Bananas",
+    "category": "Colors & Learning",
+    "theme": "safari_jungle",
+    "mascot": "lion",
+    "melody": "playful_ukulele",
+    "lines": [
+      "I like to eat, eat, eat apples and bananas!",
+      "I like to eat, eat, eat apples and bananas!",
+      "Sweet red apples, bananas yellow and bright,",
+      "Yummy, healthy fruits for morning, noon, and night!"
+    ]
+  },
+  {
+    "id": "poem_23",
+    "title": "Hey Diddle Diddle",
+    "category": "Classic Rhymes",
+    "theme": "space_galaxy",
+    "mascot": "bear",
+    "melody": "storybook_bells",
+    "lines": [
+      "Hey diddle diddle, the cat and the fiddle,",
+      "The cow jumped over the moon!",
+      "The little dog laughed to see such sport,",
+      "And the dish ran away with the spoon!"
+    ]
+  },
+  {
+    "id": "poem_24",
+    "title": "Good Night, Sleep Tight",
+    "category": "Classic Lullabies",
+    "theme": "space_galaxy",
+    "mascot": "bunny",
+    "melody": "twinkle_star",
+    "lines": [
+      "Good night, sleep tight, wake up bright in morning light,",
+      "To do what's right with all your might!",
+      "Stars are twinkling in the deep blue sky,",
+      "Sweet dreams, little one, as the night goes by."
+    ]
+  },
+  {
+    "id": "poem_25",
+    "title": "The ABC Rainbow Rhyme",
+    "category": "Colors & Learning",
+    "theme": "arcade_retro",
+    "mascot": "penguin",
+    "melody": "bouncy_march",
+    "lines": [
+      "A B C D E F G,",
+      "Sing along with happy me!",
+      "H I J K L M N O P,",
+      "Learning ABCs is easy as can be!"
+    ]
+  }
+]
