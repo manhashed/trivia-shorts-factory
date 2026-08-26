@@ -97,6 +97,57 @@ class VideoService:
                 frames.append(fp)
         return frames
 
+    def _build_option_highlight_filters(
+        self,
+        options_layer: str,
+        options: List[str],
+        correct_index: int,
+        t_ans_start: float,
+        font_path,
+        input_layer_idx: int,
+    ) -> tuple[list[str], str]:
+        """
+        Builds the filter_complex chain that restyles the correct multiple-choice
+        option into a highlighted green box with a checkmark once the answer
+        reveal begins. Returns (filter_chain_strings, new_current_layer_name).
+        The option's text is never altered -- only its box color, border, and an
+        adjacent checkmark are added, using the exact same display string already
+        rendered for that option during the question phase.
+        """
+        opt_labels = ["A", "B", "C", "D"]
+        base_opt_y = 960
+        opt_spacing = 110
+
+        opt_text = options[correct_index]
+        opt_letter = opt_labels[correct_index]
+        safe_opt = str(opt_text).replace("'", "").replace(":", "\\:").strip()
+        if safe_opt.upper().startswith(f"{opt_letter})") or safe_opt.upper().startswith(f"{opt_letter}:"):
+            opt_display = safe_opt
+        else:
+            opt_display = f"{opt_letter})  {safe_opt}"
+
+        curr_opt_y = base_opt_y + (correct_index * opt_spacing)
+
+        filters: list[str] = []
+        highlight_layer = f"with_opt_hl_{input_layer_idx}"
+        check_layer = f"with_opt_check_{input_layer_idx}"
+
+        filters.append(
+            f"[{options_layer}]drawtext=fontfile='{font_path}':text='{opt_display}':"
+            f"fontcolor=white:fontsize=46:x=(w-text_w)/2:y='{curr_opt_y}':"
+            f"borderw=6:bordercolor=black@0.95:shadowcolor=black@0.9:shadowx=4:shadowy=4:"
+            f"box=1:boxcolor=0x16A34A@0.85:boxborderw=16:"
+            f"alpha='0.85+0.15*sin(2*PI*(t-{t_ans_start})/0.6)':"
+            f"enable='gte(t,{t_ans_start})'[{highlight_layer}]"
+        )
+        filters.append(
+            f"[{highlight_layer}]drawtext=fontfile='{font_path}':text='✓':fontcolor=0xFDE047:fontsize=52:"
+            f"x=140:y='{curr_opt_y}':borderw=5:bordercolor=black@0.9:shadowcolor=black@0.9:shadowx=3:shadowy=3:"
+            f"enable='gte(t,{t_ans_start})'[{check_layer}]"
+        )
+
+        return filters, check_layer
+
     async def render_short_video(
         self,
         bg_video_path: Path,
@@ -108,6 +159,7 @@ class VideoService:
         work_dir: Path,
         config: VideoRenderConfig,
         options: Optional[List[str]] = None,
+        correct_index: Optional[int] = None,
     ) -> Path:
         work_dir.mkdir(parents=True, exist_ok=True)
         output_mp4_path.parent.mkdir(parents=True, exist_ok=True)
@@ -326,6 +378,22 @@ class VideoService:
                 )
                 options_layer = next_layer
 
+            # Highlight the single correct option (by correct_index) with a green
+            # box, checkmark, and pulse once the answer reveal begins. The
+            # un-highlighted options simply vanish at t_ans_start (unchanged
+            # behavior from the loop above) -- only the correct option is
+            # restyled and kept visible during the reveal.
+            if correct_index is not None and 0 <= correct_index < len(options[:4]):
+                highlight_filters, options_layer = self._build_option_highlight_filters(
+                    options_layer=options_layer,
+                    options=options,
+                    correct_index=correct_index,
+                    t_ans_start=t_ans_start,
+                    font_path=font_path,
+                    input_layer_idx=input_count,
+                )
+                filter_chains.extend(highlight_filters)
+
             # Adjust countdown badge position lower to fit neatly below options
             badge_base_y = base_opt_y + (len(options[:4]) * opt_spacing) + 20
             num_base_y = badge_base_y + 60
@@ -387,13 +455,17 @@ class VideoService:
         filter_chains.append(
             f"[with_num_1][6:v]overlay=x=70:y='{a_card_y}':enable='gte(t,{t_ans_start})'[with_ans_frame]"
         )
+        # This renders the original free-text `answer_text` param (e.g. "A Big Spotted
+        # Cow!") purely as decorative flavor -- it is NEVER the authoritative answer.
+        # The authoritative, spoken-and-displayed answer is the highlighted option
+        # produced by _build_option_highlight_filters() in section (f) above.
         filter_chains.append(
-            f"[with_ans_frame]drawtext=fontfile='{font_path}':text='{theme['ans_title']}':fontcolor=0xFDE047:fontsize=50:"
-            f"x=(w-text_w)/2:y='{a_hdr_y}':borderw=5:bordercolor=black@0.9:shadowcolor=black@0.9:shadowx=4:shadowy=4:enable='gte(t,{t_ans_start})'[with_ans_header]"
+            f"[with_ans_frame]drawtext=fontfile='{font_path}':text='FUN FACT':fontcolor=0xFDE047:fontsize=34:"
+            f"x=(w-text_w)/2:y='{a_hdr_y}':borderw=4:bordercolor=black@0.9:shadowcolor=black@0.9:shadowx=3:shadowy=3:enable='gte(t,{t_ans_start})'[with_ans_header]"
         )
         filter_chains.append(
             f"[with_ans_header]drawtext=fontfile='{font_path}':textfile='{escaped_a_file}':"
-            f"fontcolor=white:fontsize=64:x=(w-text_w)/2:y='{a_txt_y}':line_spacing=20:"
+            f"fontcolor=white@0.75:fontsize=32:x=(w-text_w)/2:y='{a_txt_y}':line_spacing=20:"
             f"borderw=6:bordercolor=black@0.95:shadowcolor=black@0.95:shadowx=4:shadowy=4:enable='gte(t,{t_ans_start})'[with_ans_text]"
         )
 

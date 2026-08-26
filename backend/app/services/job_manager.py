@@ -221,6 +221,7 @@ class JobManager:
                         work_dir=item_work_dir,
                         config=item_config,
                         options=item.options,
+                        correct_index=item.correct_index,
                     )
 
                     probe = probe_media_file(output_mp4)
@@ -358,6 +359,7 @@ class JobManager:
                         work_dir=item_work_dir,
                         config=item_config,
                         options=item.options,
+                        correct_index=item.correct_index,
                     )
 
                     probe = probe_media_file(output_mp4)
