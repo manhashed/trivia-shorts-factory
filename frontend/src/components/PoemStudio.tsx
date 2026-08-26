@@ -310,6 +310,30 @@ export const PoemStudio: React.FC<PoemStudioProps> = ({
             )}
           </div>
 
+          <div className="pt-2">
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Karaoke Highlight Style</label>
+            <div className="grid grid-cols-3 gap-1.5 pt-1">
+              {[
+                { value: 'bouncing_star', label: '⭐ Bouncing Star' },
+                { value: 'glow_highlight', label: '✨ Glow Highlight' },
+                { value: 'clean_cards', label: '📋 Clean Cards' },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setConfig((p) => ({ ...p, karaoke_style: opt.value as 'bouncing_star' | 'glow_highlight' | 'clean_cards' }))}
+                  className={`text-xs font-medium rounded-md px-2 py-1.5 transition-colors ${
+                    config.karaoke_style === opt.value
+                      ? 'bg-amber-500 text-slate-900 font-bold'
+                      : 'bg-slate-900 text-slate-300 hover:bg-slate-700'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Mix Mode Toggle */}
           <div className="pt-2 border-t border-slate-700/60 flex items-center justify-between">
             <div className="text-xs">
