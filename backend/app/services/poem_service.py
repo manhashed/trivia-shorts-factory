@@ -19,6 +19,27 @@ from backend.app.utils.generate_confetti import ensure_confetti_assets
 from backend.app.utils.ffmpeg_check import get_ffmpeg_binary, probe_media_file
 
 
+def resolve_dance_sprite_paths(
+    dance_dir: Path, mascot_id: str, prefer_calm: bool = True
+) -> tuple[Path, Path, Path, Path]:
+    """Resolve the 4 dance-cycle sprite paths for a mascot.
+
+    Poems prefer the calmer `{mascot_id}_poem_d{1-4}.png` frame set when it
+    exists, falling back to the shared energetic `{mascot_id}_d{1-4}.png`
+    set (also used by the trivia pipeline) for backward compatibility, and
+    finally to the "bear" sprite set if even the energetic mascot-specific
+    frames are missing.
+    """
+    if prefer_calm:
+        calm = tuple(dance_dir / f"{mascot_id}_poem_d{i}.png" for i in range(1, 5))
+        if calm[0].is_file():
+            return calm
+    energetic = tuple(dance_dir / f"{mascot_id}_d{i}.png" for i in range(1, 5))
+    if energetic[0].is_file():
+        return energetic
+    return tuple(dance_dir / f"bear_d{i}.png" for i in range(1, 5))
+
+
 class PoemService:
     """
     Studio engine for generating Singing & Dancing Mascot Poem Shorts (9:16 vertical).
@@ -42,18 +63,7 @@ class PoemService:
 
     def _get_dance_sprite_paths(self, mascot_id: str) -> tuple[Path, Path, Path, Path]:
         dance_dir = ASSETS_DIR / "images" / "mascots_dance"
-        d1 = dance_dir / f"{mascot_id}_d1.png"
-        d2 = dance_dir / f"{mascot_id}_d2.png"
-        d3 = dance_dir / f"{mascot_id}_d3.png"
-        d4 = dance_dir / f"{mascot_id}_d4.png"
-
-        if not d1.is_file():
-            # Fallback to bear
-            d1 = dance_dir / "bear_d1.png"
-            d2 = dance_dir / "bear_d2.png"
-            d3 = dance_dir / "bear_d3.png"
-            d4 = dance_dir / "bear_d4.png"
-        return d1, d2, d3, d4
+        return resolve_dance_sprite_paths(dance_dir, mascot_id, prefer_calm=True)
 
     async def prepare_poem_audio(
         self,
