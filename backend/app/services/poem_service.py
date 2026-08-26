@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import textwrap
 
-from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, TEMP_DIR, OUTPUTS_DIR, settings
+from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, TEMP_DIR, OUTPUTS_DIR, settings, DRAFT_QUALITY, FINAL_QUALITY
 from backend.app.models.poem_schemas import PoemItem, PoemRenderConfig
 from backend.app.services.tts.tts_manager import tts_manager
 from backend.app.services.vfx_helpers import (
@@ -179,6 +179,7 @@ class PoemService:
         output_mp4_path: Path,
         work_dir: Path,
         config: PoemRenderConfig,
+        quality_tier: str = "final",
     ) -> Path:
         work_dir.mkdir(parents=True, exist_ok=True)
         output_mp4_path.parent.mkdir(parents=True, exist_ok=True)
@@ -307,6 +308,8 @@ class PoemService:
 
         full_filter_complex = ";\n".join(filter_chains)
 
+        profile = DRAFT_QUALITY if quality_tier == "draft" else FINAL_QUALITY
+
         cmd = [
             ffmpeg_bin, "-y",
             "-stream_loop", "-1", "-i", str(bg_video_path),
@@ -321,7 +324,7 @@ class PoemService:
             "-filter_complex", full_filter_complex,
             "-map", "[vout]", "-map", "1:a",
             "-t", str(total_duration),
-            "-c:v", config.video_codec, "-preset", "fast", "-b:v", config.video_bitrate,
+            "-c:v", config.video_codec, "-preset", profile["preset"], "-b:v", profile["video_bitrate"],
             "-pix_fmt", config.pix_fmt, "-r", str(config.fps),
             "-c:a", config.audio_codec, "-b:a", "192k",
             str(output_mp4_path),

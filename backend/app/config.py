@@ -70,3 +70,6 @@ class AppSettings(BaseModel):
 
 
 settings = AppSettings()
+
+DRAFT_QUALITY = {"preset": "veryfast", "video_bitrate": "2500k"}
+FINAL_QUALITY = {"preset": "medium", "video_bitrate": "6000k"}

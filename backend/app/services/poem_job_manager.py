@@ -212,6 +212,7 @@ class PoemJobManager:
                         output_mp4_path=output_mp4,
                         work_dir=item_work_dir,
                         config=item_config,
+                        quality_tier="final",
                     )
 
                     probe = probe_media_file(output_mp4)

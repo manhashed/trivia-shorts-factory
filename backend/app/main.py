@@ -297,6 +297,7 @@ async def generate_single_preview(
             work_dir=work_dir,
             config=config,
             options=options,
+            quality_tier="draft",
         )
 
         if work_dir.exists():
@@ -480,6 +481,7 @@ async def generate_poem_preview(
             output_mp4_path=output_mp4,
             work_dir=work_dir,
             config=config,
+            quality_tier="draft",
         )
 
         if work_dir.exists():

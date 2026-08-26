@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import textwrap
 
-from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, settings
+from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, settings, DRAFT_QUALITY, FINAL_QUALITY
 from backend.app.services.vfx_helpers import (
     build_cinematic_bg_filter,
     build_overshoot_y_expr,
@@ -167,6 +167,7 @@ class VideoService:
         config: VideoRenderConfig,
         options: Optional[List[str]] = None,
         correct_index: Optional[int] = None,
+        quality_tier: str = "final",
     ) -> Path:
         work_dir.mkdir(parents=True, exist_ok=True)
         output_mp4_path.parent.mkdir(parents=True, exist_ok=True)
@@ -526,6 +527,8 @@ class VideoService:
 
         full_filter_complex = ";\n".join(filter_chains)
 
+        profile = DRAFT_QUALITY if quality_tier == "draft" else FINAL_QUALITY
+
         cmd = [
             ffmpeg_bin, "-y",
             *input_args,
@@ -534,8 +537,8 @@ class VideoService:
             "-map", "1:a",
             "-t", str(total_duration),
             "-c:v", config.video_codec,
-            "-preset", "fast",
-            "-b:v", config.video_bitrate,
+            "-preset", profile["preset"],
+            "-b:v", profile["video_bitrate"],
             "-pix_fmt", config.pix_fmt,
             "-r", str(config.fps),
             "-c:a", config.audio_codec,
