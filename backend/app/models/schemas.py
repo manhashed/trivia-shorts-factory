@@ -1,5 +1,5 @@
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class TriviaItem(BaseModel):
@@ -8,6 +8,7 @@ class TriviaItem(BaseModel):
     a: str = Field(..., min_length=1, description="Answer text")
     category: Optional[str] = None
     options: Optional[List[str]] = Field(default=None, description="Optional multiple-choice options (A, B, C)")
+    correct_index: Optional[int] = Field(default=None, description="Index into options that holds the correct answer")
 
     @field_validator("q", "a")
     @classmethod
@@ -16,6 +17,29 @@ class TriviaItem(BaseModel):
         if not cleaned:
             raise ValueError("Question and Answer cannot be empty or whitespace only.")
         return cleaned
+
+    @model_validator(mode="after")
+    def validate_correct_index(self) -> "TriviaItem":
+        if self.options:
+            if self.correct_index is None:
+                self.correct_index = 0
+            elif not (0 <= self.correct_index < len(self.options)):
+                raise ValueError(
+                    f"correct_index {self.correct_index} is out of range for options of length {len(self.options)}"
+                )
+        else:
+            self.correct_index = None
+        return self
+
+    @property
+    def resolved_answer(self) -> str:
+        """
+        The single source of truth for the displayed/spoken answer. Never read
+        `self.a` downstream for rendering or narration -- always use this.
+        """
+        if self.options and self.correct_index is not None:
+            return self.options[self.correct_index]
+        return self.a
 
 
 class VideoRenderConfig(BaseModel):
