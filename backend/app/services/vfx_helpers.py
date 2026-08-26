@@ -142,3 +142,37 @@ def build_flash_overlay(
     )
     return [src_chain, overlay_chain]
 
+
+def _build_outro_celebration_filters(
+    prior_layer: str,
+    confetti_input_idx: int,
+    width: int,
+    height: int,
+    outro_start: float,
+) -> tuple[list[str], str]:
+    """Build the confetti-burst + white-flash celebration filters for a poem's
+    outro (last ~1.5s pause). Chained BEFORE the final ass= subtitle filter so
+    captions stay legible on top. Returns (chains, final_layer_label).
+    """
+    chains: list[str] = []
+
+    confetti_scaled_label = "outro_confetti_scaled"
+    with_confetti_label = "with_outro_confetti"
+    chains.append(
+        f"[{prior_layer}][{confetti_scaled_label}]overlay=x=0:y=0:"
+        f"enable='between(t,{outro_start},{outro_start}+2.0)'[{with_confetti_label}]"
+    )
+    chains.append(f"[{confetti_input_idx}:v]scale={width}:{height}[{confetti_scaled_label}]")
+
+    flash_chains = build_flash_overlay(
+        prior_layer=with_confetti_label,
+        output_label="with_outro_flash",
+        width=width,
+        height=height,
+        flash_time=outro_start,
+        flash_dur=0.25,
+    )
+    chains.extend(flash_chains)
+
+    return chains, "with_outro_flash"
+

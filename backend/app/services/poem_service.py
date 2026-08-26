@@ -11,7 +11,11 @@ import textwrap
 from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, TEMP_DIR, OUTPUTS_DIR, settings
 from backend.app.models.poem_schemas import PoemItem, PoemRenderConfig
 from backend.app.services.tts.tts_manager import tts_manager
-from backend.app.services.vfx_helpers import build_cinematic_bg_filter
+from backend.app.services.vfx_helpers import (
+    _build_outro_celebration_filters,
+    build_cinematic_bg_filter,
+)
+from backend.app.utils.generate_confetti import ensure_confetti_assets
 from backend.app.utils.ffmpeg_check import get_ffmpeg_binary, probe_media_file
 
 
@@ -171,6 +175,14 @@ class PoemService:
         ffmpeg_bin = get_ffmpeg_binary()
         font_path = self._get_font_path()
 
+        vfx_dir = ASSETS_DIR / "vfx"
+        confetti_video = None
+        try:
+            vfx_assets = ensure_confetti_assets(vfx_dir)
+            confetti_video = vfx_assets.get("confetti")
+        except Exception:
+            confetti_video = None
+
         # 1. Prepare Audio
         master_audio, total_duration, ass_path = await self.prepare_poem_audio(poem, work_dir, config)
 
@@ -265,10 +277,23 @@ class PoemService:
             f"fontcolor=0x38BDF8:fontsize=38:x=(w-text_w)/2:y=910:"
             f"borderw=4:bordercolor=black@0.9:shadowcolor=black@0.9:shadowx=3:shadowy=3[with_sing_hdr]"
         )
+
+        outro_start = total_duration - 1.5
+        pre_ass_layer = "with_sing_hdr"
+        confetti_input_idx = None
+        if confetti_video and confetti_video.is_file():
+            confetti_input_idx = 8  # next free index after d1..d4 (indices 4-7)
+            celebration_chains, pre_ass_layer = _build_outro_celebration_filters(
+                prior_layer="with_sing_hdr",
+                confetti_input_idx=confetti_input_idx,
+                width=config.width,
+                height=config.height,
+                outro_start=outro_start,
+            )
+            filter_chains.extend(celebration_chains)
+
         # Apply the ASS subtitle filter for the glowing karaoke sweep!
-        filter_chains.append(
-            f"[with_sing_hdr]ass='{escaped_ass_path}'[vout]"
-        )
+        filter_chains.append(f"[{pre_ass_layer}]ass='{escaped_ass_path}'[vout]")
 
         full_filter_complex = ";\n".join(filter_chains)
 
@@ -278,23 +303,19 @@ class PoemService:
             "-i", str(master_audio),
             "-i", str(header_pill_png),
             "-i", str(lyric_card_png),
-            "-i", str(d1),
-            "-i", str(d2),
-            "-i", str(d3),
-            "-i", str(d4),
-            "-filter_complex", full_filter_complex,
-            "-map", "[vout]",
-            "-map", "1:a",
-            "-t", str(total_duration),
-            "-c:v", config.video_codec,
-            "-preset", "fast",
-            "-b:v", config.video_bitrate,
-            "-pix_fmt", config.pix_fmt,
-            "-r", str(config.fps),
-            "-c:a", config.audio_codec,
-            "-b:a", "192k",
-            str(output_mp4_path),
+            "-i", str(d1), "-i", str(d2), "-i", str(d3), "-i", str(d4),
         ]
+        if confetti_input_idx is not None:
+            cmd.extend(["-i", str(confetti_video)])
+        cmd.extend([
+            "-filter_complex", full_filter_complex,
+            "-map", "[vout]", "-map", "1:a",
+            "-t", str(total_duration),
+            "-c:v", config.video_codec, "-preset", "fast", "-b:v", config.video_bitrate,
+            "-pix_fmt", config.pix_fmt, "-r", str(config.fps),
+            "-c:a", config.audio_codec, "-b:a", "192k",
+            str(output_mp4_path),
+        ])
 
         proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if proc.returncode != 0:
