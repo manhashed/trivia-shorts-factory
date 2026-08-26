@@ -83,7 +83,7 @@ class JobManager:
                     index=idx,
                     id=item.id or f"item_{idx + 1:03d}",
                     question=item.q,
-                    answer=item.a,
+                    answer=item.resolved_answer,
                     category=item.category,
                     options=item.options,
                     mascot_used=mascot_id,
@@ -168,7 +168,7 @@ class JobManager:
 
         async def process_single(idx: int, item: TriviaItem):
             item_status = state.items[idx]
-            item_slug = slugify_text(item.a)
+            item_slug = slugify_text(item.resolved_answer)
             filename = f"quiz_{idx + 1:03d}_{item_slug}.mp4"
             output_mp4 = OUTPUTS_DIR / job_id / filename
             item_work_dir = job_dir / f"item_{idx + 1:03d}"
@@ -202,7 +202,7 @@ class JobManager:
 
                     master_audio, timing = await audio_service.prepare_quiz_audio(
                         question_text=item.q,
-                        answer_text=item.a,
+                        answer_text=item.resolved_answer,
                         work_dir=item_work_dir,
                         config=item_config,
                     )
@@ -216,7 +216,7 @@ class JobManager:
                         master_audio_path=master_audio,
                         timing_info=timing,
                         question_text=item.q,
-                        answer_text=item.a,
+                        answer_text=item.resolved_answer,
                         output_mp4_path=output_mp4,
                         work_dir=item_work_dir,
                         config=item_config,
@@ -310,7 +310,7 @@ class JobManager:
         async def retry_single(idx: int):
             item = items[idx]
             item_status = state.items[idx]
-            item_slug = slugify_text(item.a)
+            item_slug = slugify_text(item.resolved_answer)
             filename = f"quiz_{idx + 1:03d}_{item_slug}.mp4"
             output_mp4 = OUTPUTS_DIR / job_id / filename
             item_work_dir = job_dir / f"item_{idx + 1:03d}"
@@ -339,7 +339,7 @@ class JobManager:
 
                     master_audio, timing = await audio_service.prepare_quiz_audio(
                         question_text=item.q,
-                        answer_text=item.a,
+                        answer_text=item.resolved_answer,
                         work_dir=item_work_dir,
                         config=item_config,
                     )
@@ -353,7 +353,7 @@ class JobManager:
                         master_audio_path=master_audio,
                         timing_info=timing,
                         question_text=item.q,
-                        answer_text=item.a,
+                        answer_text=item.resolved_answer,
                         output_mp4_path=output_mp4,
                         work_dir=item_work_dir,
                         config=item_config,
