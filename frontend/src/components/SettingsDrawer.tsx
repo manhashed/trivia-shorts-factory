@@ -28,6 +28,8 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
 
   const edgeVoices = voices['edge'] || [];
   const openaiVoices = voices['openai'] || [];
+  const elevenlabsVoices = voices['elevenlabs'] || [];
+  const hasElevenlabsKey = Boolean(config.elevenlabs_api_key && config.elevenlabs_api_key.trim().length > 0);
 
   return (
     <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 space-y-4">
@@ -114,9 +116,10 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
               onChange={(e) => {
                 const val = e.target.value;
                 const isOai = openaiVoices.some((v) => v.id === val);
+                const isEl = elevenlabsVoices.some((v) => v.id === val);
                 onChange({
                   tts_voice: val,
-                  tts_provider: isOai ? 'openai' : 'edge',
+                  tts_provider: isEl ? 'elevenlabs' : isOai ? 'openai' : 'edge',
                 });
               }}
               className={`w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 focus:outline-none focus:border-amber-400 transition ${
@@ -139,7 +142,21 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                   ))}
                 </optgroup>
               )}
+              {hasElevenlabsKey && elevenlabsVoices.length > 0 && (
+                <optgroup label="ElevenLabs (Premium — Key Entered)">
+                  {elevenlabsVoices.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </select>
+            {!hasElevenlabsKey && (
+              <p className="text-[10px] text-slate-500 pt-0.5">
+                Enter an ElevenLabs API key below to unlock premium voices.
+              </p>
+            )}
 
             <div className="flex items-center justify-between text-slate-400">
               <span>Voice Speed:</span>
@@ -396,17 +413,31 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
             </button>
 
             {showApiKeyInput && (
-              <div className="mt-2 p-3 bg-slate-900 rounded-xl border border-slate-700/60 space-y-2">
-                <p className="text-[11px] text-slate-400">
-                  By default, <strong>Edge-TTS</strong> runs without any API key or subscription. If you prefer OpenAI TTS:
-                </p>
-                <input
-                  type="password"
-                  placeholder="sk-..."
-                  value={config.openai_api_key || ''}
-                  onChange={(e) => onChange({ openai_api_key: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400"
-                />
+              <div className="mt-2 p-3 bg-slate-900 rounded-xl border border-slate-700/60 space-y-3">
+                <div className="space-y-2">
+                  <p className="text-[11px] text-slate-400">
+                    By default, <strong>Edge-TTS</strong> runs without any API key or subscription. If you prefer OpenAI TTS:
+                  </p>
+                  <input
+                    type="password"
+                    placeholder="sk-..."
+                    value={config.openai_api_key || ''}
+                    onChange={(e) => onChange({ openai_api_key: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[11px] text-slate-400">
+                    For premium ElevenLabs voices, enter your own API key:
+                  </p>
+                  <input
+                    type="password"
+                    placeholder="el-..."
+                    value={config.elevenlabs_api_key || ''}
+                    onChange={(e) => onChange({ elevenlabs_api_key: e.target.value })}
+                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
               </div>
             )}
           </div>
