@@ -82,36 +82,43 @@ def generate_beep_countdown(output_path: Path, duration: float, num_ticks: int):
 
     write_wav(output_path, track, sr)
 
+def _note_envelope(t: float, decay_rate: float, attack_time: float = 0.008) -> float:
+    """Exponential-decay envelope with a short linear attack ramp so notes
+    don't click on at t=0. `decay_rate` controls how fast the note fades;
+    `attack_time` is the ramp-up duration in seconds (default 8ms)."""
+    attack = min(1.0, t / attack_time) if attack_time > 0 else 1.0
+    return attack * math.exp(-decay_rate * t)
+
+
 def generate_celebration_chime(output_path: Path):
     sr = 44100
     duration = 2.0
     total_samples = int(duration * sr)
     track = [(0.0, 0.0)] * total_samples
-    
     freqs = [523.25, 659.25, 783.99, 1046.50]  # C5, E5, G5, C6
     for f in freqs:
         for detune in [0.0, 3.0]:
             for i in range(total_samples):
                 t = i / sr
-                env = math.exp(-2.0 * t) # Slow decay
+                env = _note_envelope(t, decay_rate=2.0)
                 val = math.sin(2.0 * math.pi * (f + detune) * t) * env * 0.1
+                # Bell-like overtone at 2x the fundamental: quieter, decays faster.
+                overtone_env = _note_envelope(t, decay_rate=4.0)
+                overtone = math.sin(2.0 * math.pi * (f + detune) * 2.0 * t) * overtone_env * 0.1 * 0.4
+                val += overtone
                 L, R = track[i]
                 if detune > 0:
                     track[i] = (L + val * 1.2, R + val * 0.8)
                 else:
                     track[i] = (L + val * 0.8, R + val * 1.2)
-                    
-    # Sparkle trail 6000 down to 3000Hz (descending sweep)
     for i in range(total_samples):
         t = i / sr
-        env = math.exp(-3.0 * t)
+        env = _note_envelope(t, decay_rate=3.0)
         phase = 2.0 * math.pi * (6000.0 * t - 750.0 * t * t)
         val = math.sin(phase) * env * 0.05
         L, R = track[i]
-        # Alternate L/R for sparkle
         sparkle_pan = math.sin(2.0 * math.pi * 10.0 * t)
         track[i] = (L + val * (1.0 - sparkle_pan), R + val * (1.0 + sparkle_pan))
-
     write_wav(output_path, track, sr)
 
 def generate_whoosh(output_path: Path):
@@ -167,18 +174,18 @@ def generate_impact_hit(output_path: Path):
     duration = 0.15
     total_samples = int(duration * sr)
     track = [(0.0, 0.0)] * total_samples
-    
+    smoothed_noise = 0.0
     for i in range(total_samples):
         t = i / sr
         env_sine = math.exp(-15.0 * t)
         sine_val = math.sin(2.0 * math.pi * 80.0 * t) * env_sine * 0.8
-        
         env_noise = math.exp(-30.0 * t)
-        noise_val = random.uniform(-1.0, 1.0) * env_noise * 0.5
-        
-        val = sine_val + noise_val
+        raw_noise = random.uniform(-1.0, 1.0) * env_noise * 0.5
+        # One-pole low-pass on the noise layer for a punchier, less harsh
+        # "thump" instead of raw white-noise hiss.
+        smoothed_noise = 0.7 * smoothed_noise + 0.3 * raw_noise
+        val = sine_val + smoothed_noise
         track[i] = (val, val)
-        
     write_wav(output_path, track, sr)
 
 def generate_kids_cheer(output_path: Path):
