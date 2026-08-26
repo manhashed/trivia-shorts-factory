@@ -43,3 +43,44 @@ def build_cinematic_bg_filter(
         f"crop={width}:{height},"
         f"{color_treatment}[{output_label}]"
     )
+
+
+def compute_overshoot_y(
+    curr_opt_y: float,
+    delay_s: float,
+    t: float,
+    overshoot_amount: float = 18.0,
+    settle_dur: float = 0.35,
+) -> float:
+    """Pure Python mirror of the ffmpeg y_expr used for option-card entrance easing.
+
+    Mirrors exactly:
+        if(lt(t,delay_s),
+           curr_opt_y+600,
+           if(lt(t,delay_s+settle_dur),
+              curr_opt_y-overshoot_amount*sin(PI*(t-delay_s)/settle_dur)*exp(-3*(t-delay_s)),
+              curr_opt_y))
+    """
+    if t < delay_s:
+        return curr_opt_y + 600
+    if t < delay_s + settle_dur:
+        dt = t - delay_s
+        return curr_opt_y - overshoot_amount * math.sin(math.pi * dt / settle_dur) * math.exp(-3 * dt)
+    return curr_opt_y
+
+
+def build_overshoot_y_expr(
+    curr_opt_y: int,
+    delay_s: float,
+    overshoot_amount: float = 18.0,
+    settle_dur: float = 0.35,
+) -> str:
+    """Build the ffmpeg-expression-language string matching compute_overshoot_y above.
+    Only uses ffmpeg-expression-safe primitives: if/lt/sin/exp/PI/+-*/.
+    """
+    return (
+        f"if(lt(t,{delay_s}),{curr_opt_y}+600,"
+        f"if(lt(t,{delay_s}+{settle_dur}),"
+        f"{curr_opt_y}-{overshoot_amount}*sin(PI*(t-{delay_s})/{settle_dur})*exp(-3*(t-{delay_s})),"
+        f"{curr_opt_y}))"
+    )
