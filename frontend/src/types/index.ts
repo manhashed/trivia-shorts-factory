@@ -4,6 +4,7 @@ export interface TriviaItem {
   a: string;
   category?: string;
   options?: string[];
+  correct_index?: number;
 }
 
 export interface ValidationErrorItem {

@@ -22,6 +22,9 @@ export const PreviewPlayer: React.FC<PreviewPlayerProps> = ({
 
   const canPreview = items.length > 0 && !!videoData;
   const currentItem = items[selectedIndex] || items[0];
+  const resolvedAnswer = currentItem?.options && currentItem.options.length > 0
+    ? currentItem.options[currentItem.correct_index ?? 0]
+    : currentItem?.a;
 
   const handleGeneratePreview = async () => {
     if (!canPreview || !currentItem || !videoData) return;
@@ -31,7 +34,7 @@ export const PreviewPlayer: React.FC<PreviewPlayerProps> = ({
     try {
       const res = await generatePreview(
         currentItem.q,
-        currentItem.a,
+        resolvedAnswer,
         videoData.video_id,
         config,
         currentItem.options
@@ -145,7 +148,7 @@ export const PreviewPlayer: React.FC<PreviewPlayerProps> = ({
                   ))}
                 </div>
               )}
-              <p className="text-emerald-400 font-semibold">Answer: "{currentItem?.a}"</p>
+              <p className="text-emerald-400 font-semibold">Answer: "{resolvedAnswer}"</p>
             </div>
 
             {timing && (
