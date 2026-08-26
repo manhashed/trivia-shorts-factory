@@ -3,6 +3,7 @@ from typing import Dict, Any, List, Optional
 from backend.app.services.tts.base import BaseTTSProvider
 from backend.app.services.tts.edge_tts_service import EdgeTTSProvider
 from backend.app.services.tts.openai_tts_service import OpenAITTSProvider
+from backend.app.services.tts.elevenlabs_tts_service import ElevenLabsTTSProvider
 from backend.app.config import settings
 
 class TTSManager:
@@ -13,6 +14,7 @@ class TTSManager:
         self.providers: Dict[str, BaseTTSProvider] = {
             "edge": EdgeTTSProvider(),
             "openai": OpenAITTSProvider(),
+            "elevenlabs": ElevenLabsTTSProvider(),
         }
 
     def get_provider(self, name: str) -> BaseTTSProvider:
