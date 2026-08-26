@@ -11,6 +11,7 @@ import textwrap
 from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, TEMP_DIR, OUTPUTS_DIR, settings
 from backend.app.models.poem_schemas import PoemItem, PoemRenderConfig
 from backend.app.services.tts.tts_manager import tts_manager
+from backend.app.services.vfx_helpers import build_cinematic_bg_filter
 from backend.app.utils.ffmpeg_check import get_ffmpeg_binary, probe_media_file
 
 
@@ -203,10 +204,15 @@ class PoemService:
 
         # (a) Background scale & crop + VIBRANT GRAPHICS (attention grabber)
         filter_chains.append(
-            f"[0:v]scale={config.width}:{config.height}:force_original_aspect_ratio=increase,"
-            f"crop={config.width}:{config.height},"
-            f"eq=contrast=1.15:saturation=1.4:gamma=1.05,"
-            f"vignette=PI/3.5[base_bg]"
+            build_cinematic_bg_filter(
+                input_label="0:v",
+                output_label="base_bg",
+                width=config.width,
+                height=config.height,
+                total_duration=total_duration,
+                fps=config.fps,
+                zoom_enabled=True,
+            )
         )
 
         # (b) Header Title Banner (x=70, y=130)

@@ -1,11 +1,13 @@
 import subprocess
 import os
 import logging
+import random
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 import textwrap
 
 from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, settings
+from backend.app.services.vfx_helpers import build_cinematic_bg_filter
 from backend.app.models.schemas import VideoRenderConfig
 from backend.app.utils.ffmpeg_check import get_ffmpeg_binary, probe_media_file
 from backend.app.utils.generate_confetti import ensure_confetti_assets
@@ -246,19 +248,18 @@ class VideoService:
         bg_zoom = getattr(config, "background_zoom", True)
 
         # ── (a) Background scale / Ken Burns Zoom ──
-        if bg_zoom:
-            total_frames = int(total_duration * config.fps) + 10
-            filter_chains.append(
-                f"[0:v]scale={config.width + 120}:{config.height + 214}:force_original_aspect_ratio=increase,"
-                f"crop={config.width + 120}:{config.height + 214},"
-                f"zoompan=z='min(1.06,1+0.0002*on)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':"
-                f"d={total_frames}:s={config.width}x{config.height}:fps={config.fps}[base_bg]"
+        filter_chains.append(
+            build_cinematic_bg_filter(
+                input_label="0:v",
+                output_label="base_bg",
+                width=config.width,
+                height=config.height,
+                total_duration=total_duration,
+                fps=config.fps,
+                zoom_enabled=bg_zoom,
+                zoom_direction=random.choice(["in", "out"]),
             )
-        else:
-            filter_chains.append(
-                f"[0:v]scale={config.width}:{config.height}:force_original_aspect_ratio=increase,"
-                f"crop={config.width}:{config.height}[base_bg]"
-            )
+        )
 
         # ── (b) Header Pill Banner (x=70, y=140) ──
         filter_chains.append(
