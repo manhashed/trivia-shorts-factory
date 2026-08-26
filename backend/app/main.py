@@ -87,33 +87,33 @@ def list_mascots():
     return [
         {
             "id": "bear",
-            "name": "Barnaby Bear",
+            "name": "Rex the Ranger Bear",
             "emoji": "🐻",
-            "tagline": "Curious & Warm Storyteller",
+            "tagline": "Bold Quiz Champion",
             "voice": "en-US-AnaNeural",
             "theme": "candy_clouds"
         },
         {
             "id": "penguin",
-            "name": "Penny Penguin",
+            "name": "Nova the Star Penguin",
             "emoji": "🐧",
-            "tagline": "Energetic Ice Explorer",
+            "tagline": "Cosmic Speed Racer",
             "voice": "en-US-JennyNeural",
             "theme": "ocean_bubbles"
         },
         {
             "id": "lion",
-            "name": "Leo Lion Cub",
+            "name": "Blaze the Brave Lion",
             "emoji": "🦁",
-            "tagline": "Brave Safari Adventurer",
+            "tagline": "Fearless Game Host",
             "voice": "en-US-GuyNeural",
             "theme": "safari_jungle"
         },
         {
             "id": "bunny",
-            "name": "Bella Bunny",
+            "name": "Comet the Quick Bunny",
             "emoji": "🐰",
-            "tagline": "Gentle Nature Guide",
+            "tagline": "Lightning-Fast Explorer",
             "voice": "en-GB-SoniaNeural",
             "theme": "candy_clouds"
         },

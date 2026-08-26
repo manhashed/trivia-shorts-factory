@@ -1,12 +1,59 @@
+import math
 from pathlib import Path
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
+
+SUPERSAMPLE = 4
+
+
+def _supersampled_canvas(size: int, supersample: int = SUPERSAMPLE) -> tuple[Image.Image, ImageDraw.ImageDraw]:
+    """Create an RGBA canvas at `size * supersample` px so shapes drawn on it
+    can later be downsampled with LANCZOS for anti-aliased, crisp edges
+    instead of the jagged circles flat ImageDraw primitives produce at
+    native resolution."""
+    big = size * supersample
+    img = Image.new("RGBA", (big, big), (0, 0, 0, 0))
+    return img, ImageDraw.Draw(img)
+
+
+def _paste_gradient_ellipse(img: Image.Image, bbox: list, inner_color: tuple, outer_color: tuple) -> None:
+    """Paint a radial-gradient-filled ellipse into `img` at `bbox`: `inner_color`
+    at the center fading to `outer_color` at the rim, for a simple "3D toy"
+    shading look instead of a flat single-color fill."""
+    x0, y0, x1, y1 = bbox
+    w, h = int(x1 - x0), int(y1 - y0)
+    if w <= 0 or h <= 0:
+        return
+    mask_size = max(w, h)
+    raw_mask = Image.radial_gradient("L").resize((mask_size, mask_size), Image.LANCZOS)
+    raw_mask = ImageOps.invert(raw_mask)
+    mask = raw_mask.resize((w, h), Image.LANCZOS)
+    inner_layer = Image.new("RGBA", (w, h), inner_color)
+    outer_layer = Image.new("RGBA", (w, h), outer_color)
+    patch = Image.composite(inner_layer, outer_layer, mask)
+    ellipse_mask = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(ellipse_mask).ellipse([0, 0, w - 1, h - 1], fill=255)
+    img.paste(patch, (int(x0), int(y0)), ellipse_mask)
+
+
+def _finalize(img: Image.Image, size: int, supersample: int = SUPERSAMPLE) -> Image.Image:
+    """Add a soft drop shadow behind the character, then downsample the
+    supersampled canvas to the final `size x size` output with LANCZOS."""
+    silhouette_alpha = img.split()[-1]
+    shadow_flat = Image.new("RGBA", img.size, (20, 20, 30, 140))
+    shadow = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    shadow.paste(shadow_flat, (0, 0), silhouette_alpha)
+    offset = 14 * supersample
+    shadow_layer = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    shadow_layer.paste(shadow, (offset, offset), shadow)
+    shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(radius=10 * supersample))
+    composed = Image.alpha_composite(shadow_layer, img)
+    return composed.resize((size, size), Image.LANCZOS)
+
 
 def render_bear(asking: bool, size: int = 512) -> Image.Image:
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    cx, cy = size // 2, size // 2 + 20
-
-    # Colors
+    img, d = _supersampled_canvas(size)
+    s = SUPERSAMPLE
+    cx, cy = (size * s) // 2, (size * s) // 2 + 20 * s
     c_fur = (198, 125, 68, 255)
     c_fur_light = (222, 155, 98, 255)
     c_muzzle = (250, 225, 195, 255)
@@ -15,239 +62,190 @@ def render_bear(asking: bool, size: int = 512) -> Image.Image:
     c_eye = (35, 25, 20, 255)
     c_cap = (59, 130, 246, 255) if asking else (16, 185, 129, 255)
 
-    # Ears
-    d.ellipse([cx - 190, cy - 200, cx - 70, cy - 80], fill=c_fur)
-    d.ellipse([cx - 170, cy - 180, cx - 90, cy - 100], fill=c_inner_ear)
-    d.ellipse([cx + 70, cy - 200, cx + 190, cy - 80], fill=c_fur)
-    d.ellipse([cx + 90, cy - 180, cx + 170, cy - 100], fill=c_inner_ear)
+    _paste_gradient_ellipse(img, [cx - 190*s, cy - 200*s, cx - 70*s, cy - 80*s], c_fur_light, c_fur)
+    d.ellipse([cx - 170*s, cy - 180*s, cx - 90*s, cy - 100*s], fill=c_inner_ear)
+    _paste_gradient_ellipse(img, [cx + 70*s, cy - 200*s, cx + 190*s, cy - 80*s], c_fur_light, c_fur)
+    d.ellipse([cx + 90*s, cy - 180*s, cx + 170*s, cy - 100*s], fill=c_inner_ear)
+    _paste_gradient_ellipse(img, [cx - 160*s, cy - 140*s, cx + 160*s, cy + 140*s], c_fur_light, c_fur)
 
-    # Head
-    d.ellipse([cx - 160, cy - 140, cx + 160, cy + 140], fill=c_fur)
-    d.ellipse([cx - 150, cy - 130, cx + 150, cy + 130], fill=c_fur_light)
-
-    # Cap / Hat
     if asking:
-        d.chord([cx - 110, cy - 210, cx + 110, cy - 110], start=180, end=360, fill=c_cap)
-        d.ellipse([cx - 130, cy - 135, cx + 130, cy - 105], fill=(37, 99, 235, 255))
-        d.ellipse([cx - 15, cy - 185, cx + 15, cy - 155], fill=(250, 204, 21, 255))
+        d.chord([cx - 110*s, cy - 210*s, cx + 110*s, cy - 110*s], start=180, end=360, fill=c_cap)
+        d.ellipse([cx - 130*s, cy - 135*s, cx + 130*s, cy - 105*s], fill=(37, 99, 235, 255))
+        d.ellipse([cx - 15*s, cy - 185*s, cx + 15*s, cy - 155*s], fill=(250, 204, 21, 255))
     else:
-        # Party hat
-        d.polygon([(cx, cy - 240), (cx - 70, cy - 120), (cx + 70, cy - 120)], fill=c_cap)
-        d.ellipse([cx - 18, cy - 255, cx + 18, cy - 225], fill=(251, 191, 36, 255))
+        d.polygon([(cx, cy - 240*s), (cx - 70*s, cy - 120*s), (cx + 70*s, cy - 120*s)], fill=c_cap)
+        d.ellipse([cx - 18*s, cy - 255*s, cx + 18*s, cy - 225*s], fill=(251, 191, 36, 255))
 
-    # Muzzle & Cheeks
-    d.ellipse([cx - 95, cy - 20, cx + 95, cy + 110], fill=c_muzzle)
-    d.ellipse([cx - 135, cy + 10, cx - 75, cy + 60], fill=c_cheeks)
-    d.ellipse([cx + 75, cy + 10, cx + 135, cy + 60], fill=c_cheeks)
+    d.ellipse([cx - 95*s, cy - 20*s, cx + 95*s, cy + 110*s], fill=c_muzzle)
+    d.ellipse([cx - 135*s, cy + 10*s, cx - 75*s, cy + 60*s], fill=c_cheeks)
+    d.ellipse([cx + 75*s, cy + 10*s, cx + 135*s, cy + 60*s], fill=c_cheeks)
+    d.ellipse([cx - 28*s, cy + 10*s, cx + 28*s, cy + 48*s], fill=(45, 25, 15, 255))
+    d.ellipse([cx - 14*s, cy + 15*s, cx - 3*s, cy + 26*s], fill=(255, 255, 255, 200))
 
-    # Nose & Mouth
-    d.ellipse([cx - 28, cy + 10, cx + 28, cy + 48], fill=(45, 25, 15, 255))
-    d.ellipse([cx - 14, cy + 15, cx - 3, cy + 26], fill=(255, 255, 255, 200))
     if asking:
-        d.arc([cx - 35, cy + 45, cx + 5, cy + 85], start=0, end=140, fill=(45, 25, 15, 255), width=6)
-        d.arc([cx - 5, cy + 45, cx + 35, cy + 85], start=40, end=180, fill=(45, 25, 15, 255), width=6)
-        # Eyes curious
-        d.ellipse([cx - 90, cy - 65, cx - 25, cy + 5], fill=c_eye)
-        d.ellipse([cx - 80, cy - 55, cx - 50, cy - 25], fill=(255, 255, 255, 255))
-        d.ellipse([cx + 25, cy - 65, cx + 90, cy + 5], fill=c_eye)
-        d.ellipse([cx + 35, cy - 55, cx + 65, cy - 25], fill=(255, 255, 255, 255))
+        d.arc([cx - 35*s, cy + 45*s, cx + 5*s, cy + 85*s], start=0, end=140, fill=(45, 25, 15, 255), width=6*s)
+        d.arc([cx - 5*s, cy + 45*s, cx + 35*s, cy + 85*s], start=40, end=180, fill=(45, 25, 15, 255), width=6*s)
+        d.ellipse([cx - 90*s, cy - 65*s, cx - 25*s, cy + 5*s], fill=c_eye)
+        d.ellipse([cx - 80*s, cy - 55*s, cx - 50*s, cy - 25*s], fill=(255, 255, 255, 255))
+        d.ellipse([cx + 25*s, cy - 65*s, cx + 90*s, cy + 5*s], fill=c_eye)
+        d.ellipse([cx + 35*s, cy - 55*s, cx + 65*s, cy - 25*s], fill=(255, 255, 255, 255))
     else:
-        # Cheering open grin
-        d.chord([cx - 45, cy + 40, cx + 45, cy + 95], start=0, end=180, fill=(185, 28, 28, 255))
-        d.chord([cx - 25, cy + 60, cx + 25, cy + 95], start=0, end=180, fill=(244, 114, 182, 255))
-        # Happy eyes
-        d.arc([cx - 85, cy - 50, cx - 30, cy + 5], start=180, end=360, fill=c_eye, width=12)
-        d.arc([cx + 30, cy - 50, cx + 85, cy + 5], start=180, end=360, fill=c_eye, width=12)
-        # Celebration Stars
-        for sx, sy, rad in [(cx - 180, cy - 80, 20), (cx + 180, cy - 80, 20)]:
+        d.chord([cx - 45*s, cy + 40*s, cx + 45*s, cy + 95*s], start=0, end=180, fill=(185, 28, 28, 255))
+        d.chord([cx - 25*s, cy + 60*s, cx + 25*s, cy + 95*s], start=0, end=180, fill=(244, 114, 182, 255))
+        d.arc([cx - 85*s, cy - 50*s, cx - 30*s, cy + 5*s], start=180, end=360, fill=c_eye, width=12*s)
+        d.arc([cx + 30*s, cy - 50*s, cx + 85*s, cy + 5*s], start=180, end=360, fill=c_eye, width=12*s)
+        for sx, sy, rad in [(cx - 180*s, cy - 80*s, 20*s), (cx + 180*s, cy - 80*s, 20*s)]:
             d.ellipse([sx - rad, sy - rad, sx + rad, sy + rad], fill=(251, 191, 36, 255))
 
-    # Bowtie
-    d.polygon([(cx - 70, cy + 125), (cx, cy + 150), (cx - 70, cy + 175)], fill=(239, 68, 68, 255))
-    d.polygon([(cx + 70, cy + 125), (cx, cy + 150), (cx + 70, cy + 175)], fill=(239, 68, 68, 255))
-    d.ellipse([cx - 20, cy + 135, cx + 20, cy + 165], fill=(220, 38, 38, 255))
-    return img
+    d.polygon([(cx - 70*s, cy + 125*s), (cx, cy + 150*s), (cx - 70*s, cy + 175*s)], fill=(239, 68, 68, 255))
+    d.polygon([(cx + 70*s, cy + 125*s), (cx, cy + 150*s), (cx + 70*s, cy + 175*s)], fill=(239, 68, 68, 255))
+    d.ellipse([cx - 20*s, cy + 135*s, cx + 20*s, cy + 165*s], fill=(220, 38, 38, 255))
+
+    return _finalize(img, size, s)
 
 
 def render_penguin(asking: bool, size: int = 512) -> Image.Image:
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    cx, cy = size // 2, size // 2 + 20
+    img, d = _supersampled_canvas(size)
+    s = SUPERSAMPLE
+    cx, cy = (size * s) // 2, (size * s) // 2 + 20 * s
 
-    # Colors
     c_body = (30, 41, 59, 255)
+    c_body_light = (51, 65, 85, 255)
     c_belly = (255, 255, 255, 255)
+    c_belly_shadow = (226, 232, 240, 255)
     c_beak = (245, 158, 11, 255)
     c_cheeks = (251, 113, 133, 180)
     c_earmuffs = (168, 85, 247, 255)
 
-    # Body
-    d.ellipse([cx - 160, cy - 160, cx + 160, cy + 150], fill=c_body)
-    # White Face/Belly Mask
-    d.ellipse([cx - 120, cy - 100, cx + 120, cy + 140], fill=c_belly)
-    d.ellipse([cx - 100, cy - 130, cx, cy - 10], fill=c_belly)
-    d.ellipse([cx, cy - 130, cx + 100, cy - 10], fill=c_belly)
+    _paste_gradient_ellipse(img, [cx - 160*s, cy - 160*s, cx + 160*s, cy + 150*s], c_body_light, c_body)
+    _paste_gradient_ellipse(img, [cx - 120*s, cy - 100*s, cx + 120*s, cy + 140*s], c_belly, c_belly_shadow)
+    d.ellipse([cx - 100*s, cy - 130*s, cx, cy - 10*s], fill=c_belly)
+    d.ellipse([cx, cy - 130*s, cx + 100*s, cy - 10*s], fill=c_belly)
 
-    # Earmuffs Headband
-    d.arc([cx - 150, cy - 190, cx + 150, cy - 30], start=180, end=360, fill=c_earmuffs, width=14)
-    d.ellipse([cx - 180, cy - 130, cx - 120, cy - 60], fill=c_earmuffs)
-    d.ellipse([cx + 120, cy - 130, cx + 180, cy - 60], fill=c_earmuffs)
+    d.arc([cx - 150*s, cy - 190*s, cx + 150*s, cy - 30*s], start=180, end=360, fill=c_earmuffs, width=14*s)
+    d.ellipse([cx - 180*s, cy - 130*s, cx - 120*s, cy - 60*s], fill=c_earmuffs)
+    d.ellipse([cx + 120*s, cy - 130*s, cx + 180*s, cy - 60*s], fill=c_earmuffs)
 
-    # Cheeks
-    d.ellipse([cx - 110, cy + 10, cx - 60, cy + 50], fill=c_cheeks)
-    d.ellipse([cx + 60, cy + 10, cx + 110, cy + 50], fill=c_cheeks)
+    d.ellipse([cx - 110*s, cy + 10*s, cx - 60*s, cy + 50*s], fill=c_cheeks)
+    d.ellipse([cx + 60*s, cy + 10*s, cx + 110*s, cy + 50*s], fill=c_cheeks)
 
-    # Beak
-    d.polygon([(cx, cy + 45), (cx - 35, cy + 5), (cx + 35, cy + 5)], fill=c_beak)
+    d.polygon([(cx, cy + 45*s), (cx - 35*s, cy + 5*s), (cx + 35*s, cy + 5*s)], fill=c_beak)
 
-    # Eyes & Poses
     if asking:
-        d.ellipse([cx - 75, cy - 75, cx - 20, cy - 10], fill=(15, 23, 42, 255))
-        d.ellipse([cx - 65, cy - 65, cx - 40, cy - 35], fill=(255, 255, 255, 255))
-        d.ellipse([cx + 20, cy - 75, cx + 75, cy - 10], fill=(15, 23, 42, 255))
-        d.ellipse([cx + 30, cy - 65, cx + 55, cy - 35], fill=(255, 255, 255, 255))
+        d.ellipse([cx - 75*s, cy - 75*s, cx - 20*s, cy - 10*s], fill=(15, 23, 42, 255))
+        d.ellipse([cx - 65*s, cy - 65*s, cx - 40*s, cy - 35*s], fill=(255, 255, 255, 255))
+        d.ellipse([cx + 20*s, cy - 75*s, cx + 75*s, cy - 10*s], fill=(15, 23, 42, 255))
+        d.ellipse([cx + 30*s, cy - 65*s, cx + 55*s, cy - 35*s], fill=(255, 255, 255, 255))
     else:
-        d.arc([cx - 75, cy - 65, cx - 20, cy - 15], start=180, end=360, fill=(15, 23, 42, 255), width=12)
-        d.arc([cx + 20, cy - 65, cx + 75, cy - 15], start=180, end=360, fill=(15, 23, 42, 255), width=12)
-        # Cheering stars
-        for sx, sy, rad in [(cx - 170, cy - 90, 18), (cx + 170, cy - 90, 18)]:
+        d.arc([cx - 75*s, cy - 65*s, cx - 20*s, cy - 15*s], start=180, end=360, fill=(15, 23, 42, 255), width=12*s)
+        d.arc([cx + 20*s, cy - 65*s, cx + 75*s, cy - 15*s], start=180, end=360, fill=(15, 23, 42, 255), width=12*s)
+        for sx, sy, rad in [(cx - 170*s, cy - 90*s, 18*s), (cx + 170*s, cy - 90*s, 18*s)]:
             d.ellipse([sx - rad, sy - rad, sx + rad, sy + rad], fill=(250, 204, 21, 255))
 
-    # Winter Scarf (Teal)
-    d.rounded_rectangle([cx - 110, cy + 120, cx + 110, cy + 160], radius=15, fill=(20, 184, 166, 255))
-    return img
+    d.rounded_rectangle([cx - 110*s, cy + 120*s, cx + 110*s, cy + 160*s], radius=15*s, fill=(20, 184, 166, 255))
+    return _finalize(img, size, s)
 
 
 def render_lion(asking: bool, size: int = 512) -> Image.Image:
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    cx, cy = size // 2, size // 2 + 20
+    img, d = _supersampled_canvas(size)
+    s = SUPERSAMPLE
+    cx, cy = (size * s) // 2, (size * s) // 2 + 20 * s
 
-    # Colors
-    c_mane = (217, 119, 6, 255) # Warm Amber mane
-    c_fur = (251, 191, 36, 255) # Gold fur
+    c_mane = (217, 119, 6, 255)
+    c_fur = (251, 191, 36, 255)
+    c_fur_light = (253, 224, 71, 255)
     c_muzzle = (254, 243, 199, 255)
     c_nose = (180, 83, 9, 255)
     c_cheeks = (251, 146, 60, 180)
 
-    # Big Fluffy Mane
     for angle_step in range(0, 360, 30):
-        import math
         rad = math.radians(angle_step)
-        mx = cx + int(160 * math.cos(rad))
-        my = cy + int(150 * math.sin(rad))
-        d.ellipse([mx - 60, my - 60, mx + 60, my + 60], fill=c_mane)
+        mx = cx + int(160 * s * math.cos(rad))
+        my = cy + int(150 * s * math.sin(rad))
+        d.ellipse([mx - 60*s, my - 60*s, mx + 60*s, my + 60*s], fill=c_mane)
 
-    # Head
-    d.ellipse([cx - 140, cy - 130, cx + 140, cy + 130], fill=c_fur)
+    _paste_gradient_ellipse(img, [cx - 140*s, cy - 130*s, cx + 140*s, cy + 130*s], c_fur_light, c_fur)
 
-    # Ears
-    d.ellipse([cx - 150, cy - 160, cx - 70, cy - 80], fill=c_fur)
-    d.ellipse([cx - 130, cy - 145, cx - 90, cy - 95], fill=(245, 158, 11, 255))
-    d.ellipse([cx + 70, cy - 160, cx + 150, cy - 80], fill=c_fur)
-    d.ellipse([cx + 90, cy - 145, cx + 130, cy - 95], fill=(245, 158, 11, 255))
+    d.ellipse([cx - 150*s, cy - 160*s, cx - 70*s, cy - 80*s], fill=c_fur)
+    d.ellipse([cx - 130*s, cy - 145*s, cx - 90*s, cy - 95*s], fill=(245, 158, 11, 255))
+    d.ellipse([cx + 70*s, cy - 160*s, cx + 150*s, cy - 80*s], fill=c_fur)
+    d.ellipse([cx + 90*s, cy - 145*s, cx + 130*s, cy - 95*s], fill=(245, 158, 11, 255))
 
-    # Muzzle & Cheeks
-    d.ellipse([cx - 85, cy - 10, cx + 85, cy + 100], fill=c_muzzle)
-    d.ellipse([cx - 115, cy + 15, cx - 65, cy + 55], fill=c_cheeks)
-    d.ellipse([cx + 65, cy + 15, cx + 115, cy + 55], fill=c_cheeks)
+    d.ellipse([cx - 85*s, cy - 10*s, cx + 85*s, cy + 100*s], fill=c_muzzle)
+    d.ellipse([cx - 115*s, cy + 15*s, cx - 65*s, cy + 55*s], fill=c_cheeks)
+    d.ellipse([cx + 65*s, cy + 15*s, cx + 115*s, cy + 55*s], fill=c_cheeks)
 
-    # Nose & Smile
-    d.polygon([(cx, cy + 40), (cx - 25, cy + 10), (cx + 25, cy + 10)], fill=c_nose)
+    d.polygon([(cx, cy + 40*s), (cx - 25*s, cy + 10*s), (cx + 25*s, cy + 10*s)], fill=c_nose)
 
     if asking:
-        # Whiskers
-        d.line([(cx - 70, cy + 40), (cx - 110, cy + 30)], fill=(120, 53, 15, 255), width=4)
-        d.line([(cx + 70, cy + 40), (cx + 110, cy + 30)], fill=(120, 53, 15, 255), width=4)
-        # Inquisitive Big Eyes
-        d.ellipse([cx - 80, cy - 65, cx - 25, cy - 5], fill=(45, 25, 15, 255))
-        d.ellipse([cx - 70, cy - 55, cx - 45, cy - 25], fill=(255, 255, 255, 255))
-        d.ellipse([cx + 25, cy - 65, cx + 80, cy - 5], fill=(45, 25, 15, 255))
-        d.ellipse([cx + 35, cy - 55, cx + 60, cy - 25], fill=(255, 255, 255, 255))
+        d.line([(cx - 70*s, cy + 40*s), (cx - 110*s, cy + 30*s)], fill=(120, 53, 15, 255), width=4*s)
+        d.line([(cx + 70*s, cy + 40*s), (cx + 110*s, cy + 30*s)], fill=(120, 53, 15, 255), width=4*s)
+        d.ellipse([cx - 80*s, cy - 65*s, cx - 25*s, cy - 5*s], fill=(45, 25, 15, 255))
+        d.ellipse([cx - 70*s, cy - 55*s, cx - 45*s, cy - 25*s], fill=(255, 255, 255, 255))
+        d.ellipse([cx + 25*s, cy - 65*s, cx + 80*s, cy - 5*s], fill=(45, 25, 15, 255))
+        d.ellipse([cx + 35*s, cy - 55*s, cx + 60*s, cy - 25*s], fill=(255, 255, 255, 255))
     else:
-        # Cheering King Crown
-        d.polygon([(cx - 70, cy - 160), (cx - 40, cy - 130), (cx, cy - 180), (cx + 40, cy - 130), (cx + 70, cy - 160), (cx + 50, cy - 110), (cx - 50, cy - 110)], fill=(250, 204, 21, 255))
-        # Happy roaring smile
-        d.chord([cx - 40, cy + 35, cx + 40, cy + 85], start=0, end=180, fill=(185, 28, 28, 255))
-        d.arc([cx - 75, cy - 55, cx - 25, cy - 5], start=180, end=360, fill=(45, 25, 15, 255), width=12)
-        d.arc([cx + 25, cy - 55, cx + 75, cy - 5], start=180, end=360, fill=(45, 25, 15, 255), width=12)
+        d.polygon([(cx - 70*s, cy - 160*s), (cx - 40*s, cy - 130*s), (cx, cy - 180*s), (cx + 40*s, cy - 130*s), (cx + 70*s, cy - 160*s), (cx + 50*s, cy - 110*s), (cx - 50*s, cy - 110*s)], fill=(250, 204, 21, 255))
+        d.chord([cx - 40*s, cy + 35*s, cx + 40*s, cy + 85*s], start=0, end=180, fill=(185, 28, 28, 255))
+        d.arc([cx - 75*s, cy - 55*s, cx - 25*s, cy - 5*s], start=180, end=360, fill=(45, 25, 15, 255), width=12*s)
+        d.arc([cx + 25*s, cy - 55*s, cx + 75*s, cy - 5*s], start=180, end=360, fill=(45, 25, 15, 255), width=12*s)
 
-    return img
+    return _finalize(img, size, s)
 
 
 def render_bunny(asking: bool, size: int = 512) -> Image.Image:
-    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    cx, cy = size // 2, size // 2 + 40
+    img, d = _supersampled_canvas(size)
+    s = SUPERSAMPLE
+    cx, cy = (size * s) // 2, (size * s) // 2 + 40 * s
 
-    # Colors
-    c_fur = (248, 250, 252, 255) # Pure white
+    c_fur = (248, 250, 252, 255)
     c_fur_shadow = (226, 232, 240, 255)
     c_inner_ear = (253, 164, 175, 255)
     c_cheeks = (251, 113, 133, 180)
     c_flower = (244, 63, 94, 255)
 
-    # Tall Bunny Ears
-    # Left Ear
-    d.ellipse([cx - 120, cy - 270, cx - 40, cy - 80], fill=c_fur_shadow)
-    d.ellipse([cx - 110, cy - 260, cx - 50, cy - 90], fill=c_fur)
-    d.ellipse([cx - 100, cy - 240, cx - 60, cy - 110], fill=c_inner_ear)
-    # Right Ear
-    d.ellipse([cx + 40, cy - 270, cx + 120, cy - 80], fill=c_fur_shadow)
-    d.ellipse([cx + 50, cy - 260, cx + 110, cy - 90], fill=c_fur)
-    d.ellipse([cx + 60, cy - 240, cx + 100, cy - 110], fill=c_inner_ear)
+    _paste_gradient_ellipse(img, [cx - 120*s, cy - 270*s, cx - 40*s, cy - 80*s], c_fur, c_fur_shadow)
+    d.ellipse([cx - 100*s, cy - 240*s, cx - 60*s, cy - 110*s], fill=c_inner_ear)
+    _paste_gradient_ellipse(img, [cx + 40*s, cy - 270*s, cx + 120*s, cy - 80*s], c_fur, c_fur_shadow)
+    d.ellipse([cx + 60*s, cy - 240*s, cx + 100*s, cy - 110*s], fill=c_inner_ear)
 
-    # Head
-    d.ellipse([cx - 145, cy - 130, cx + 145, cy + 120], fill=c_fur_shadow)
-    d.ellipse([cx - 140, cy - 125, cx + 140, cy + 115], fill=c_fur)
+    _paste_gradient_ellipse(img, [cx - 145*s, cy - 130*s, cx + 145*s, cy + 120*s], c_fur, c_fur_shadow)
 
-    # Flower on ear
-    d.ellipse([cx - 50, cy - 140, cx - 10, cy - 100], fill=c_flower)
-    d.ellipse([cx - 35, cy - 125, cx - 25, cy - 115], fill=(250, 204, 21, 255))
+    d.ellipse([cx - 50*s, cy - 140*s, cx - 10*s, cy - 100*s], fill=c_flower)
+    d.ellipse([cx - 35*s, cy - 125*s, cx - 25*s, cy - 115*s], fill=(250, 204, 21, 255))
 
-    # Rosy Cheeks
-    d.ellipse([cx - 120, cy + 5, cx - 70, cy + 45], fill=c_cheeks)
-    d.ellipse([cx + 70, cy + 5, cx + 120, cy + 45], fill=c_cheeks)
+    d.ellipse([cx - 120*s, cy + 5*s, cx - 70*s, cy + 45*s], fill=c_cheeks)
+    d.ellipse([cx + 70*s, cy + 5*s, cx + 120*s, cy + 45*s], fill=c_cheeks)
 
-    # Little Pink Nose
-    d.ellipse([cx - 18, cy + 5, cx + 18, cy + 30], fill=(244, 63, 94, 255))
+    d.ellipse([cx - 18*s, cy + 5*s, cx + 18*s, cy + 30*s], fill=(244, 63, 94, 255))
 
     if asking:
-        # Inquisitive soft eyes
-        d.ellipse([cx - 80, cy - 55, cx - 30, cy - 5], fill=(30, 41, 59, 255))
-        d.ellipse([cx - 70, cy - 45, cx - 50, cy - 20], fill=(255, 255, 255, 255))
-        d.ellipse([cx + 30, cy - 55, cx + 80, cy - 5], fill=(30, 41, 59, 255))
-        d.ellipse([cx + 40, cy - 45, cx + 60, cy - 20], fill=(255, 255, 255, 255))
-        # Bunny Whiskers
-        d.line([(cx - 60, cy + 25), (cx - 110, cy + 15)], fill=(148, 163, 184, 255), width=3)
-        d.line([(cx + 60, cy + 25), (cx + 110, cy + 15)], fill=(148, 163, 184, 255), width=3)
+        d.ellipse([cx - 80*s, cy - 55*s, cx - 30*s, cy - 5*s], fill=(30, 41, 59, 255))
+        d.ellipse([cx - 70*s, cy - 45*s, cx - 50*s, cy - 20*s], fill=(255, 255, 255, 255))
+        d.ellipse([cx + 30*s, cy - 55*s, cx + 80*s, cy - 5*s], fill=(30, 41, 59, 255))
+        d.ellipse([cx + 40*s, cy - 45*s, cx + 60*s, cy - 20*s], fill=(255, 255, 255, 255))
+        d.line([(cx - 60*s, cy + 25*s), (cx - 110*s, cy + 15*s)], fill=(148, 163, 184, 255), width=3*s)
+        d.line([(cx + 60*s, cy + 25*s), (cx + 110*s, cy + 15*s)], fill=(148, 163, 184, 255), width=3*s)
     else:
-        # Happy Winking / Cheering Eyes
-        d.arc([cx - 80, cy - 45, cx - 30, cy + 5], start=180, end=360, fill=(30, 41, 59, 255), width=10)
-        d.arc([cx + 30, cy - 45, cx + 80, cy + 5], start=180, end=360, fill=(30, 41, 59, 255), width=10)
-        # Cheering Sparkles
-        for sx, sy, rad in [(cx - 160, cy - 100, 16), (cx + 160, cy - 100, 16)]:
+        d.arc([cx - 80*s, cy - 45*s, cx - 30*s, cy + 5*s], start=180, end=360, fill=(30, 41, 59, 255), width=10*s)
+        d.arc([cx + 30*s, cy - 45*s, cx + 80*s, cy + 5*s], start=180, end=360, fill=(30, 41, 59, 255), width=10*s)
+        for sx, sy, rad in [(cx - 160*s, cy - 100*s, 16*s), (cx + 160*s, cy - 100*s, 16*s)]:
             d.ellipse([sx - rad, sy - rad, sx + rad, sy + rad], fill=(251, 191, 36, 255))
 
-    return img
+    return _finalize(img, size, s)
 
 
 def generate_all_mascots(output_dir: Path):
     mascot_dir = output_dir / "mascots"
     mascot_dir.mkdir(parents=True, exist_ok=True)
-
     render_bear(asking=True).save(mascot_dir / "bear_asking.png", "PNG")
     render_bear(asking=False).save(mascot_dir / "bear_cheering.png", "PNG")
-
     render_penguin(asking=True).save(mascot_dir / "penguin_asking.png", "PNG")
     render_penguin(asking=False).save(mascot_dir / "penguin_cheering.png", "PNG")
-
     render_lion(asking=True).save(mascot_dir / "lion_asking.png", "PNG")
     render_lion(asking=False).save(mascot_dir / "lion_cheering.png", "PNG")
-
     render_bunny(asking=True).save(mascot_dir / "bunny_asking.png", "PNG")
     render_bunny(asking=False).save(mascot_dir / "bunny_cheering.png", "PNG")
-
     print(f"Successfully generated all 4 mascot characters (8 poses) in {mascot_dir}")
 
 
