@@ -5,6 +5,7 @@ from typing import Dict, Any, Tuple, Optional
 
 from backend.app.config import AUDIO_DIR, settings
 from backend.app.models.schemas import VideoRenderConfig
+from backend.app.services.phrase_variety import build_answer_reveal_phrase
 from backend.app.services.tts.tts_manager import tts_manager
 from backend.app.utils.ffmpeg_check import get_ffmpeg_binary, probe_media_file
 from backend.app.utils.generate_sfx import (
@@ -83,11 +84,9 @@ class AudioService:
         )
 
         # 2. Synthesize Answer Audio
-        # Use child-engaging phrasing if not already present
-        if not answer_text.lower().startswith("the answer") and not answer_text.lower().startswith("it's") and not answer_text.lower().startswith("it is"):
-            answer_spoken_text = f"The answer is... {answer_text}!"
-        else:
-            answer_spoken_text = answer_text
+        # Vary the reveal carrier phrase on every render while keeping the
+        # exact resolved answer text (answer_text) verbatim and untouched.
+        answer_spoken_text = build_answer_reveal_phrase(answer_text)
 
         a_audio_path = work_dir / "a_tts.wav"
         a_duration = await tts_manager.synthesize(
