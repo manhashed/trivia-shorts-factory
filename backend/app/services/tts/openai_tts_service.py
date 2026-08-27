@@ -1,12 +1,14 @@
 import httpx
 from pathlib import Path
 from typing import List, Dict, Any
+from backend.app.config import settings
 from backend.app.services.tts.base import BaseTTSProvider
 from backend.app.utils.ffmpeg_check import convert_mp3_to_wav
 
 class OpenAITTSProvider(BaseTTSProvider):
     """
     OpenAI TTS adapter supporting alloy, echo, fable, onyx, nova, and shimmer.
+    OPENAI_BASE_URL may point at any compatible /audio/speech endpoint.
     """
 
     AVAILABLE_VOICES = [
@@ -44,15 +46,16 @@ class OpenAITTSProvider(BaseTTSProvider):
             "Content-Type": "application/json"
         }
         payload = {
-            "model": "tts-1",
+            "model": settings.openai_tts_model,
             "input": text,
             "voice": voice if voice in [v["id"] for v in self.AVAILABLE_VOICES] else "nova",
             "speed": max(0.5, min(2.0, speed)),
             "response_format": "mp3"
         }
 
+        speech_url = f"{settings.openai_base_url}/audio/speech"
         async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post("https://api.openai.com/v1/audio/speech", headers=headers, json=payload)
+            resp = await client.post(speech_url, headers=headers, json=payload)
             if resp.status_code != 200:
                 raise RuntimeError(f"OpenAI TTS API error ({resp.status_code}): {resp.text}")
             

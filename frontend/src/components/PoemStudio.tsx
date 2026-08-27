@@ -17,7 +17,7 @@ import {
   Search,
 } from 'lucide-react';
 import { PoemItem, PoemRenderConfig, PoemBatchJobState, MelodyOption } from '../types/poem';
-import { MascotInfo, TemplateInfo, CategoryInfo } from '../types';
+import { MascotInfo, TemplateInfo, CategoryInfo, TtsStatus } from '../types';
 import {
   getPoemBank,
   getPoemCategories,
@@ -30,11 +30,13 @@ import {
 interface PoemStudioProps {
   mascots: MascotInfo[];
   templates: TemplateInfo[];
+  ttsStatus?: TtsStatus;
 }
 
 export const PoemStudio: React.FC<PoemStudioProps> = ({
   mascots,
   templates,
+  ttsStatus,
 }) => {
   const [poems, setPoems] = useState<PoemItem[]>([]);
   const [categories, setCategories] = useState<CategoryInfo[]>([]);
@@ -87,6 +89,15 @@ export const PoemStudio: React.FC<PoemStudioProps> = ({
     getPoemCategories().then(setCategories).catch(console.error);
     getMelodies().then(setMelodies).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (!ttsStatus) return;
+    setConfig((prev) => ({
+      ...prev,
+      tts_provider: ttsStatus.default_provider,
+      tts_voice: ttsStatus.default_voice,
+    }));
+  }, [ttsStatus]);
 
   // SSE Stream Listener for Poem Batch Progress
   useEffect(() => {
@@ -656,7 +667,7 @@ export const PoemStudio: React.FC<PoemStudioProps> = ({
                 </div>
                 <div>
                   <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    <span>25+ Preschool Nursery Rhymes & Poem Bank</span>
+                    <span>25+ Kids Nursery Rhymes & Poem Bank (Ages 5–8)</span>
                     <span className="text-xs px-2.5 py-0.5 rounded-full bg-pink-500 text-white font-bold">
                       {poems.length} Rhymes
                     </span>

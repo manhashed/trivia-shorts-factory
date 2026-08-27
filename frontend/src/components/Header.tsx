@@ -1,12 +1,19 @@
 import React from 'react';
 import { Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
+import { HealthStatus } from '../types';
 
 interface HeaderProps {
-  health: {
-    status: string;
-    ffmpeg_installed: boolean;
-    app_version: string;
-  } | null;
+  health: HealthStatus | null;
+}
+
+function ttsBadgeLabel(health: HealthStatus | null): string {
+  const tts = health?.tts;
+  if (!tts) return 'Edge Neural TTS (Free)';
+  const provider = tts.providers[tts.default_provider];
+  if (tts.default_provider === 'edge' || !provider?.configured) {
+    return 'Edge Neural TTS (Free)';
+  }
+  return `${provider.label} (from .env)`;
 }
 
 export const Header: React.FC<HeaderProps> = ({ health }) => {
@@ -23,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({ health }) => {
               <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-1.5 font-sans">
                 Trivia Shorts Factory
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 font-medium">
-                  Kids 3–5 Edition
+                  Kids 5–8 Edition
                 </span>
               </h1>
             </div>
@@ -50,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({ health }) => {
 
           <div className="flex items-center space-x-1 text-xs text-slate-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl text-amber-300">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Edge Neural TTS (Free)</span>
+            <span>{ttsBadgeLabel(health)}</span>
           </div>
         </div>
       </div>

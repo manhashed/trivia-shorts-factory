@@ -1,6 +1,7 @@
 fastapi>=0.115.0
 uvicorn>=0.30.0
 pydantic>=2.8.0
+python-dotenv>=1.0.0
 edge-tts>=7.0.0
 static-ffmpeg>=2.5
 imageio-ffmpeg>=0.5.0

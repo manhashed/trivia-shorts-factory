@@ -10,17 +10,19 @@ import {
   ChevronUp,
   Sparkles,
 } from 'lucide-react';
-import { VideoRenderConfig, VoiceOption } from '../types';
+import { VideoRenderConfig, VoiceOption, TtsStatus } from '../types';
 
 interface SettingsDrawerProps {
   config: VideoRenderConfig;
   voices: Record<string, VoiceOption[]>;
+  ttsStatus?: TtsStatus;
   onChange: (updated: Partial<VideoRenderConfig>) => void;
 }
 
 export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
   config,
   voices,
+  ttsStatus,
   onChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +31,12 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
   const edgeVoices = voices['edge'] || [];
   const openaiVoices = voices['openai'] || [];
   const elevenlabsVoices = voices['elevenlabs'] || [];
-  const hasElevenlabsKey = Boolean(config.elevenlabs_api_key && config.elevenlabs_api_key.trim().length > 0);
+  const openaiConfigured =
+    Boolean(config.openai_api_key && config.openai_api_key.trim().length > 0) ||
+    Boolean(ttsStatus?.providers.openai.configured);
+  const elevenlabsConfigured =
+    Boolean(config.elevenlabs_api_key && config.elevenlabs_api_key.trim().length > 0) ||
+    Boolean(ttsStatus?.providers.elevenlabs.configured);
 
   return (
     <div className="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 space-y-4">
@@ -51,7 +58,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                 </span>
               ) : (
                 <span className="text-xs px-2 py-0.5 bg-amber-400/20 text-amber-300 rounded font-normal">
-                  Kids 3–5 Optimized
+                  Kids 5–8 Optimized
                 </span>
               )}
             </h3>
@@ -126,7 +133,7 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                 config.mix_mode ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              <optgroup label="Microsoft Edge Neural (Free & Recommended for Kids)">
+              <optgroup label="Microsoft Edge Neural (Free default)">
                 {edgeVoices.map((v) => (
                   <option key={v.id} value={v.id}>
                     {v.name}
@@ -134,27 +141,39 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                 ))}
               </optgroup>
               {openaiVoices.length > 0 && (
-                <optgroup label="OpenAI TTS (Requires API Key)">
+                <optgroup
+                  label={
+                    openaiConfigured
+                      ? 'OpenAI TTS (Ready)'
+                      : 'OpenAI TTS (Add API key below or in .env)'
+                  }
+                >
                   {openaiVoices.map((v) => (
-                    <option key={v.id} value={v.id}>
+                    <option key={v.id} value={v.id} disabled={!openaiConfigured}>
                       {v.name}
                     </option>
                   ))}
                 </optgroup>
               )}
-              {hasElevenlabsKey && elevenlabsVoices.length > 0 && (
-                <optgroup label="ElevenLabs (Premium — Key Entered)">
+              {elevenlabsVoices.length > 0 && (
+                <optgroup
+                  label={
+                    elevenlabsConfigured
+                      ? 'ElevenLabs (Ready)'
+                      : 'ElevenLabs (Add API key below or in .env)'
+                  }
+                >
                   {elevenlabsVoices.map((v) => (
-                    <option key={v.id} value={v.id}>
+                    <option key={v.id} value={v.id} disabled={!elevenlabsConfigured}>
                       {v.name}
                     </option>
                   ))}
                 </optgroup>
               )}
             </select>
-            {!hasElevenlabsKey && (
+            {!openaiConfigured && !elevenlabsConfigured && (
               <p className="text-[10px] text-slate-500 pt-0.5">
-                Enter an ElevenLabs API key below to unlock premium voices.
+                Free Edge voices work with no key. Put OPENAI_API_KEY or ELEVENLABS_API_KEY in `.env` to swap engines.
               </p>
             )}
 
@@ -409,14 +428,23 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
               className="text-slate-400 hover:text-slate-300 flex items-center gap-1 text-[11px]"
             >
               <Key className="w-3.5 h-3.5" />
-              <span>{showApiKeyInput ? 'Hide API Key Settings' : 'Configure Custom OpenAI API Key (Optional)'}</span>
+              <span>{showApiKeyInput ? 'Hide API Key Settings' : 'Plug in OpenAI or ElevenLabs (optional)'}</span>
             </button>
 
             {showApiKeyInput && (
               <div className="mt-2 p-3 bg-slate-900 rounded-xl border border-slate-700/60 space-y-3">
+                <p className="text-[11px] text-slate-400">
+                  Keys in <strong>.env</strong> are loaded automatically and never shown here. Paste a key only to override for this session.
+                  {ttsStatus?.providers.openai.configured && (
+                    <span className="block text-emerald-400 mt-1">OpenAI key detected on the server.</span>
+                  )}
+                  {ttsStatus?.providers.elevenlabs.configured && (
+                    <span className="block text-emerald-400 mt-1">ElevenLabs key detected on the server.</span>
+                  )}
+                </p>
                 <div className="space-y-2">
                   <p className="text-[11px] text-slate-400">
-                    By default, <strong>Edge-TTS</strong> runs without any API key or subscription. If you prefer OpenAI TTS:
+                    OpenAI TTS session override:
                   </p>
                   <input
                     type="password"
@@ -428,11 +456,11 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                 </div>
                 <div className="space-y-2">
                   <p className="text-[11px] text-slate-400">
-                    For premium ElevenLabs voices, enter your own API key:
+                    ElevenLabs session override:
                   </p>
                   <input
                     type="password"
-                    placeholder="el-..."
+                    placeholder="xi-..."
                     value={config.elevenlabs_api_key || ''}
                     onChange={(e) => onChange({ elevenlabs_api_key: e.target.value })}
                     className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-400"

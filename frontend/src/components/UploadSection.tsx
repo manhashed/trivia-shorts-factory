@@ -76,7 +76,7 @@ export const UploadSection: React.FC<UploadSectionProps> = ({
             </span>
           </h2>
           <p className="text-sm text-slate-400 mt-0.5">
-            Load curated preschool questions or upload your own custom JSON & background video.
+            Load curated ages 5–8 questions or upload your own custom JSON & background video.
           </p>
         </div>
 

@@ -1,27 +1,27 @@
 [
   {
-    "q": "What color is a ripe banana?",
-    "a": "Bright Yellow!",
-    "category": "Colors & Fruits"
-  },
-  {
-    "q": "Which friendly farm animal says 'Moo'?",
-    "a": "A Big Spotted Cow!",
-    "category": "Farm Animals"
-  },
-  {
-    "q": "How many fingers do you have on one hand?",
-    "a": "Five Fingers!",
-    "category": "Counting"
-  },
-  {
-    "q": "What shape is a delicious slice of pizza pie?",
-    "a": "A Triangle!",
-    "category": "Shapes"
-  },
-  {
-    "q": "What cute animal hops around and loves crunchy carrots?",
-    "a": "A Fluffy Bunny Rabbit!",
+    "q": "How many legs does a spider have?",
+    "a": "Eight legs!",
     "category": "Animals"
+  },
+  {
+    "q": "Which animal is the largest living land mammal?",
+    "a": "The African elephant!",
+    "category": "Animals"
+  },
+  {
+    "q": "What do caterpillars turn into?",
+    "a": "Butterflies!",
+    "category": "Life Cycles"
+  },
+  {
+    "q": "Which bird cannot fly but is a fast swimmer?",
+    "a": "A penguin!",
+    "category": "Animals"
+  },
+  {
+    "q": "What do bees collect from flowers to make honey?",
+    "a": "Nectar!",
+    "category": "Insects"
   }
 ]

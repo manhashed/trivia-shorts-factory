@@ -19,14 +19,14 @@ export const MascotGuide: React.FC = () => {
           </div>
 
           <p className="text-slate-300 leading-relaxed">
-            For <strong>3–5 year olds (toddlers & preschoolers)</strong>, short attention spans thrive on:
+            For <strong>5–8 year olds (early elementary)</strong>, curious minds thrive on:
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
             <div className="p-2.5 bg-slate-900/80 rounded-xl border border-slate-700/60">
               <span className="font-bold text-amber-400 block mb-0.5">⏱️ 3s Rhythmic Countdown</span>
               <span className="text-[11px] text-slate-400">
-                Gives young kids time to guess aloud before the answer reveal.
+                Gives kids a beat to shout the answer before the reveal.
               </span>
             </div>
 

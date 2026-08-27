@@ -13,6 +13,7 @@ import {
   BatchJobState,
   MascotInfo,
   TemplateInfo,
+  HealthStatus,
 } from './types';
 import {
   checkHealth,
@@ -39,13 +40,7 @@ import { PoemStudio } from './components/PoemStudio';
 export const App: React.FC = () => {
   const [activeStudio, setActiveStudio] = useState<'trivia' | 'poem'>('trivia');
 
-  const [health, setHealth] = useState<{
-    status: string;
-    ffmpeg_installed: boolean;
-    ffmpeg_path: string | null;
-    app_version: string;
-    error: string | null;
-  } | null>(null);
+  const [health, setHealth] = useState<HealthStatus | null>(null);
 
   const [voices, setVoices] = useState<Record<string, VoiceOption[]>>({});
   const [mascots, setMascots] = useState<MascotInfo[]>([]);
@@ -90,7 +85,16 @@ export const App: React.FC = () => {
   // Load initial health, voice, mascot, and template lists
   useEffect(() => {
     checkHealth()
-      .then(setHealth)
+      .then((status) => {
+        setHealth(status);
+        if (status.tts) {
+          setConfig((prev) => ({
+            ...prev,
+            tts_provider: status.tts!.default_provider,
+            tts_voice: status.tts!.default_voice,
+          }));
+        }
+      })
       .catch((err) => console.error('Health check error:', err));
 
     getVoices()
@@ -226,7 +230,7 @@ export const App: React.FC = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 space-y-8">
         {activeStudio === 'poem' ? (
           /* 🎵 SINGING & DANCING POEM STUDIO */
-          <PoemStudio mascots={mascots} templates={templates} />
+          <PoemStudio mascots={mascots} templates={templates} ttsStatus={health?.tts} />
         ) : (
           /* 🧠 TRIVIA & QUIZ STUDIO */
           <>
@@ -264,6 +268,7 @@ export const App: React.FC = () => {
             <SettingsDrawer
               config={config}
               voices={voices}
+              ttsStatus={health?.tts}
               onChange={(updated) => setConfig((prev) => ({ ...prev, ...updated }))}
             />
 

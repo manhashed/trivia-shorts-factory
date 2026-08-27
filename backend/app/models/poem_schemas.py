@@ -1,6 +1,8 @@
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 
+from backend.app.config import settings
+
 
 class PoemItem(BaseModel):
     id: Optional[str] = None
@@ -42,8 +44,8 @@ class PoemRenderConfig(BaseModel):
     melody_track: str = "twinkle_star" # "twinkle_star", "playful_ukulele", "storybook_bells", "bouncy_march", "none"
     melody_volume: float = Field(0.20, ge=0.0, le=1.0)
     
-    tts_provider: str = "edge"
-    tts_voice: str = "en-US-AnaNeural"
+    tts_provider: str = Field(default_factory=lambda: settings.default_tts_provider)
+    tts_voice: str = Field(default_factory=lambda: settings.default_voice)
     tts_speed: str = "+0%"
     
     # 120 BPM = 0.5s per dance step

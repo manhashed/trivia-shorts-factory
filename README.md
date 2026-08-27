@@ -1,42 +1,146 @@
-# 🐻 Trivia & Quiz Shorts Factory (Kids 3–5 Edition)
+# 🐻 Trivia & Quiz Shorts Factory (Kids 5–8 Edition)
 
-An automated full-stack production system that transforms trivia JSON datasets (`[{"q": "...", "a": "..."}]`) and looping MP4 background videos into individual, high-retention 9:16 vertical short-form quiz videos for **YouTube Shorts, TikTok, and Instagram Reels**.
+An automated full-stack studio that turns trivia JSON (`[{"q": "...", "a": "..."}]`) and looping MP4 backgrounds into 9:16 shorts for **YouTube Shorts, TikTok, and Instagram Reels**.
 
-Specialized for **Children Ages 3–5 (Toddler / Preschool)** with interactive host **Barnaby Bear**, bright visual cards, animated 3-2-1 countdowns, and joyful sound effects.
+Built for **children ages 5–8 (kindergarten through early elementary)** with host **Barnaby Bear**, high-contrast cards, a 3-2-1 countdown, and a shout-the-answer beat.
+
+Voice starts on **free Microsoft Edge Neural TTS**. Swap in **OpenAI** or **ElevenLabs** (or an OpenAI-compatible speech API) with a `.env` file — no code changes.
+
+Repo: [https://github.com/manhashed/trivia-shorts-factory](https://github.com/manhashed/trivia-shorts-factory)
+
+---
+
+## Fork and run
+
+### 1. Fork the repo
+
+On GitHub, open [manhashed/trivia-shorts-factory](https://github.com/manhashed/trivia-shorts-factory) and click **Fork**. Use your fork’s URL in the clone step below.
+
+### 2. Clone
+
+```bash
+git clone https://github.com/YOUR_USER/trivia-shorts-factory.git
+cd trivia-shorts-factory
+```
+
+Or clone this repo directly:
+
+```bash
+git clone https://github.com/manhashed/trivia-shorts-factory.git
+cd trivia-shorts-factory
+```
+
+### 3. Prerequisites
+
+- Python 3.10+
+- Node.js 18+ (pnpm, npm, or bun)
+- Git
+
+FFmpeg is pulled in by the Python packages. A system FFmpeg install also works.
+
+### 4. Python backend
+
+```bash
+python3 -m venv venv
+./venv/bin/pip install -r backend/requirements.txt
+cp .env.example .env
+```
+
+Leave `.env` as-is to stay on free Edge TTS. Add paid keys later if you want OpenAI or ElevenLabs.
+
+### 5. Frontend
+
+The FastAPI server serves the built UI from `frontend/dist`, so build once:
+
+```bash
+cd frontend
+pnpm install
+pnpm run build
+cd ..
+```
+
+If you do not have pnpm:
+
+```bash
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+### 6. Run the server
+
+```bash
+./run_server.sh
+```
+
+Or:
+
+```bash
+PYTHONPATH=. ./venv/bin/uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+Open **http://127.0.0.1:8000** in your browser.
+
+You should see the Kids 5–8 studio (Trivia + Poem tabs) and an FFmpeg / Edge TTS status chip in the header.
+
+### 7. Make a first short
+
+1. Pick a mascot and background theme, or load a sample from `examples/`.
+2. Click the 5-second preview to check voice and timing.
+3. Start a batch. Finished MP4s land in `storage/outputs/` and download as a ZIP.
 
 ---
 
 ## 🌟 Key Features
 
 1. **Deterministic FFmpeg Video Engine**:
-   - Auto-scales and crops any source video (landscape, square, or portrait) to **1080×1920 (9:16)** vertical format.
-   - Seamless background video looping (`-stream_loop -1`).
-   - Adheres to standard YouTube Shorts / TikTok UI safe zones.
-   - Text wrapping and bounding box safeguards to eliminate text clipping.
+   - Auto-scales and crops any source video to **1080×1920 (9:16)**.
+   - Seamless background looping (`-stream_loop -1`).
+   - YouTube Shorts / TikTok UI safe zones, wrapped text, no clipped cards.
 
-2. **Microsoft Edge Neural TTS (Free Default)**:
-   - Zero API key required, zero billing, high-fidelity neural voice synthesis.
-   - Pre-configured child & storybook narrator voices:
-     - `en-US-AnaNeural` (Child / Cheerful — recommended for 3–5)
-     - `en-US-JennyNeural` (Storybook narrator)
-     - `en-US-GuyNeural` (Energetic host)
-     - `en-GB-SoniaNeural` (Preschool teacher)
-   - Extensible provider adapter for **OpenAI TTS** (`nova`, `fable`, `alloy`) and ElevenLabs.
+2. **Pluggable voice engines**:
+   - **Edge TTS (default, free)**: no API key. Kid-friendly voices such as `en-US-AnaNeural`.
+   - **OpenAI TTS**: set `OPENAI_API_KEY` (and optionally `OPENAI_BASE_URL` for a compatible `/audio/speech` API).
+   - **ElevenLabs**: set `ELEVENLABS_API_KEY`.
+   - Keys load from `.env`. The UI never needs the secret pasted in. Missing paid keys fall back to Edge so renders still work.
 
-3. **High-Attention Kid Engagement Mechanics**:
-   - **Host Mascot**: **Barnaby Bear** in *Asking* pose (during Question + Countdown) and *Excited / Cheering* pose (during Answer reveal).
-   - **Audio Cues**: 3-second woodblock clock tick-tock countdown and magical fanfare chime on answer reveal.
-   - **Card Design**: Rounded high-contrast translucent cards with bold typography.
+3. **High-attention kids 5–8 mechanics**:
+   - Host mascot in asking vs cheering poses.
+   - Woodblock countdown + fanfare on the reveal.
+   - Rounded high-contrast cards and bold type that reads on a phone.
 
-4. **Instant 5-Second Test Preview**:
-   - Single-item test button (`/api/preview`) to inspect voice, timing, and visual overlays before initiating large batches.
+4. **5-second test preview** at `/api/preview` before a full batch.
 
-5. **Asynchronous Batch Job Manager**:
-   - Concurrency control (default 3 workers) to prevent CPU thrashing.
-   - Real-time Server-Sent Events (SSE) progress broadcasting.
-   - **Error Isolation**: Failed questions report actionable error logs without failing the batch.
-   - **Selective Retry**: One-click re-render for failed items.
-   - Final ZIP bundle generation (`manifest.json` + all standalone MP4s).
+5. **Async batch jobs** with SSE progress, isolated failures, retry, and a ZIP of MP4s.
+
+---
+
+## 🔌 Plug in a different AI voice
+
+Copy the example env file, fill the keys you want, restart the backend:
+
+```bash
+cp .env.example .env
+```
+
+| Goal | What to set |
+| --- | --- |
+| Keep the free default | `TTS_PROVIDER=edge` and leave API keys empty |
+| Use OpenAI voices (`nova`, `fable`, `alloy`, …) | `TTS_PROVIDER=openai`, `TTS_VOICE=nova`, `OPENAI_API_KEY=sk-...` |
+| Use ElevenLabs | `TTS_PROVIDER=elevenlabs`, `TTS_VOICE=21m00Tcm4TlvDq8ikWAM`, `ELEVENLABS_API_KEY=...` |
+| Point OpenAI at a compatible speech API | `OPENAI_BASE_URL=https://your-proxy.example/v1` (must expose `POST /audio/speech`) |
+
+`GET /api/health` reports which engines are configured **without returning the keys**. In the studio, paid voices unlock automatically when the server has a key.
+
+You can still paste a one-off key in **Step 2 → Plug in OpenAI or ElevenLabs**. That overrides `.env` for the current session only.
+
+### Add another TTS vendor
+
+1. Copy `backend/app/services/tts/openai_tts_service.py` (or `edge_tts_service.py`).
+2. Implement `BaseTTSProvider.synthesize` + `list_voices`.
+3. Register the class in `TTSManager.providers`.
+4. Add the API key to `.env.example`, `AppSettings`, and `tts_status()`.
 
 ---
 
@@ -44,10 +148,11 @@ Specialized for **Children Ages 3–5 (Toddler / Preschool)** with interactive h
 
 ```
 trivia/
+├── .env.example                        # Copy to .env — never commit secrets
 ├── backend/
 │   ├── app/
 │   │   ├── main.py                     # FastAPI application & API endpoints
-│   │   ├── config.py                   # Configuration & media defaults
+│   │   ├── config.py                   # Loads .env, media defaults, TTS status
 │   │   ├── models/
 │   │   │   └── schemas.py              # Pydantic validation models
 │   │   ├── services/
@@ -58,40 +163,26 @@ trivia/
 │   │   │   ├── zip_service.py          # Batch packaging
 │   │   │   └── tts/
 │   │   │       ├── base.py             # TTS abstract interface
-│   │   │       ├── edge_tts_service.py # Edge-TTS implementation
+│   │   │       ├── edge_tts_service.py # Edge-TTS (free)
 │   │   │       ├── openai_tts_service.py
+│   │   │       ├── elevenlabs_tts_service.py
 │   │   │       └── tts_manager.py
 │   │   ├── assets/
 │   │   │   ├── audio/                  # Tick-tock & celebration chime SFX
 │   │   │   ├── fonts/                  # Fredoka / Arial Rounded Bold TTF
-│   │   │   └── images/                 # Mascot PNG assets (Asking & Cheering)
+│   │   │   └── images/                 # Mascot PNG assets
 │   │   └── utils/
-│   │       ├── ffmpeg_check.py         # FFmpeg detection & media probing
-│   │       ├── generate_sfx.py         # Audio synthesizer
-│   │       └── generate_mascot.py      # Mascot renderer
 │   ├── tests/
-│   │   ├── test_validator.py           # Unit tests
-│   │   ├── test_api_integration.py     # Endpoint tests
-│   │   ├── test_prototype.py           # Single-item render test
-│   │   └── test_batch_flow.py          # Full batch flow test
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
-│   │   ├── App.tsx                     # Main dashboard
+│   │   ├── App.tsx
 │   │   ├── components/
-│   │   │   ├── Header.tsx              # Brand header
-│   │   │   ├── UploadSection.tsx       # Drag-and-drop uploader & sample loader
-│   │   │   ├── SettingsDrawer.tsx      # Voice & style controls
-│   │   │   ├── PreviewPlayer.tsx       # 9:16 interactive test preview player
-│   │   │   ├── BatchProgress.tsx       # Live per-question pipeline status
-│   │   │   └── MascotGuide.tsx         # Preschool retention tips
 │   │   └── services/
-│   │       └── api.ts                  # API client
-│   ├── package.json
-│   └── vite.config.ts
+│   └── package.json
 ├── examples/
-│   ├── toddler_animals_quiz.json       # Sample dataset 1
-│   └── preschool_colors_shapes.json    # Sample dataset 2
+│   ├── toddler_animals_quiz.json       # Sample ages 5–8 animal facts
+│   └── preschool_colors_shapes.json    # Sample ages 5–8 science / shapes
 └── storage/
     ├── uploads/
     ├── temp/
@@ -100,49 +191,11 @@ trivia/
 
 ---
 
-## 🚀 Quick Start Guide
-
-### 1. Prerequisites
-- Python 3.10+
-- Node.js 18+ (or pnpm / bun)
-
-### 2. Backend Setup
-```bash
-# Set up Python virtual environment
-python3 -m venv venv
-./venv/bin/pip install -r backend/requirements.txt
-
-# (Optional) Verify FFmpeg & dependencies
-PYTHONPATH=. ./venv/bin/pytest backend/tests/test_validator.py backend/tests/test_api_integration.py
-```
-
-### 3. Frontend Build
-```bash
-cd frontend
-pnpm install
-pnpm run build
-cd ..
-```
-
-### 4. Start the Application
-```bash
-# Start unified FastAPI server (serves API + React UI on port 8000)
-PYTHONPATH=. ./venv/bin/uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
-```
-Open **http://127.0.0.1:8000** in your browser.
-
----
-
 ## 🧪 Running Automated Tests
 
 ```bash
-# 1. Run all unit and integration tests
 PYTHONPATH=. ./venv/bin/pytest backend/tests/
-
-# 2. Run end-to-end single video rendering test
 PYTHONPATH=. ./venv/bin/python backend/tests/test_prototype.py
-
-# 3. Run full batch processing & ZIP generation test
 PYTHONPATH=. ./venv/bin/python backend/tests/test_batch_flow.py
 ```
 
@@ -150,7 +203,8 @@ PYTHONPATH=. ./venv/bin/python backend/tests/test_batch_flow.py
 
 ## 🔒 Security & Robustness
 
-- **Shell Injection Immunity**: FFmpeg text filters use dedicated UTF-8 text files (`textfile=...`) rather than raw command string interpolation.
-- **Input Sanitization**: Unicode normalization (NFC), control character filtering, and length validation.
-- **Error Isolation**: Individual question failures do not abort the batch. Actionable logs are surfaced with one-click retry.
-- **Auto-Cleanup**: Scratch audio files and intermediate text cards are cleaned immediately upon video rendering.
+- **Secrets**: `.env` is gitignored. `.env.example` has empty placeholders only. Health status never returns API keys.
+- **Shell injection**: FFmpeg text filters use UTF-8 `textfile=` rather than interpolating user text into the command.
+- **Input sanitization**: Unicode NFC, control-character filtering, length checks.
+- **Error isolation**: One failed question does not abort the batch.
+- **Auto-cleanup**: Scratch audio and text cards are removed after each render.

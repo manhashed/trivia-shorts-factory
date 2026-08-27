@@ -8,17 +8,12 @@ import {
   MascotInfo,
   TemplateInfo,
   CategoryInfo,
+  HealthStatus,
 } from '../types';
 
 const API_BASE = '/api';
 
-export async function checkHealth(): Promise<{
-  status: string;
-  ffmpeg_installed: boolean;
-  ffmpeg_path: string | null;
-  app_version: string;
-  error: string | null;
-}> {
+export async function checkHealth(): Promise<HealthStatus> {
   const res = await fetch(`${API_BASE}/health`);
   if (!res.ok) throw new Error('Failed to reach backend server.');
   return res.json();

@@ -1,6 +1,8 @@
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from backend.app.config import settings
+
 
 class TriviaItem(BaseModel):
     id: Optional[str] = None
@@ -87,9 +89,9 @@ class VideoRenderConfig(BaseModel):
     audio_normalize: bool = Field(default=True, description="Apply loudnorm audio normalization")
     sfx_volume: float = Field(default=0.6, ge=0.0, le=1.0, description="Sound effects volume")
 
-    # TTS Settings
-    tts_provider: str = "edge"  # "edge", "openai", "elevenlabs"
-    tts_voice: str = "en-US-AnaNeural" # Friendly child voice
+    # TTS Settings — defaults come from .env (TTS_PROVIDER / TTS_VOICE)
+    tts_provider: str = Field(default_factory=lambda: settings.default_tts_provider)
+    tts_voice: str = Field(default_factory=lambda: settings.default_voice)
     tts_speed: str = "+0%"
     tts_pitch: str = "+0Hz"
     openai_api_key: Optional[str] = None

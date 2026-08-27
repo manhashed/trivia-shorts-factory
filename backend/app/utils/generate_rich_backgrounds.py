@@ -25,7 +25,7 @@ def draw_vertical_gradient(draw: ImageDraw.ImageDraw, top_color: tuple, bottom_c
 
 def generate_candy_clouds_video(output_mp4: Path, work_dir: Path):
     """
-    Generates a gorgeous high-retention toddler background:
+    Generates a gorgeous high-retention kids 5–8 background:
     Pastel sky gradient + floating fluffy white clouds + floating colorful balloons & stars.
     """
     frames_dir = work_dir / "candy_frames"

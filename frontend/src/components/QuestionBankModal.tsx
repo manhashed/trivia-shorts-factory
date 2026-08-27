@@ -64,7 +64,7 @@ export const QuestionBankModal: React.FC<QuestionBankModalProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `toddler_quiz_bank_${selectedCategory}.json`;
+    a.download = `kids_5_8_quiz_bank_${selectedCategory}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -80,13 +80,13 @@ export const QuestionBankModal: React.FC<QuestionBankModalProps> = ({
             </div>
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <span>100+ Preschool Trivia Bank (Ages 3–5)</span>
+                <span>100+ Early Elementary Trivia Bank (Ages 5–8)</span>
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 font-bold">
                   100 Questions
                 </span>
               </h2>
               <p className="text-xs text-slate-400">
-                Toddler-tested questions across 10 fun preschool categories with multiple choice options.
+                Classroom-ready questions across 10 fun categories with multiple choice options.
               </p>
             </div>
           </div>
@@ -148,7 +148,7 @@ export const QuestionBankModal: React.FC<QuestionBankModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6 space-y-3 custom-scrollbar bg-slate-950/30">
           {isLoading ? (
             <div className="py-12 text-center text-xs text-amber-300 animate-pulse">
-              Loading preschool questions...
+              Loading ages 5–8 questions...
             </div>
           ) : filteredQuestions.length === 0 ? (
             <div className="py-12 text-center text-xs text-slate-500">

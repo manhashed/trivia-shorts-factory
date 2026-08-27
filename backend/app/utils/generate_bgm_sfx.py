@@ -31,12 +31,12 @@ def generate_tone(freq: float, duration: float, sample_rate: int = 44100, volume
     return samples
 
 def generate_nursery_bgm_loop(output_path: Path, duration: float = 8.0, sample_rate: int = 44100):
-    """Generates an upbeat, gentle preschool nursery melody loop (C - G - Am - F progression)."""
+    """Generates an upbeat, gentle early-elementary melody loop (C - G - Am - F progression)."""
     total_samples = int(duration * sample_rate)
     track = [0.0] * total_samples
 
     # Melody notes: (time_sec, freq_hz)
-    # C Major Preschool theme
+    # C Major kids 5–8 theme
     melody = [
         # Measure 1: C Major (C4 - E4 - G4 - E4)
         (0.0, 261.63), (0.5, 329.63), (1.0, 392.00), (1.5, 329.63),

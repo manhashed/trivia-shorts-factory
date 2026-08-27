@@ -1,6 +1,7 @@
 import httpx
 from pathlib import Path
 from typing import List, Dict, Any
+from backend.app.config import settings
 from backend.app.services.tts.base import BaseTTSProvider
 from backend.app.utils.ffmpeg_check import convert_mp3_to_wav
 
@@ -24,7 +25,7 @@ class ElevenLabsTTSProvider(BaseTTSProvider):
         headers = {"xi-api-key": api_key, "Content-Type": "application/json"}
         payload = {
             "text": text,
-            "model_id": "eleven_multilingual_v2",
+            "model_id": settings.elevenlabs_model,
             "voice_settings": {"stability": 0.5, "similarity_boost": 0.75},
         }
         url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"

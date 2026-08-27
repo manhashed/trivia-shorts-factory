@@ -30,6 +30,37 @@ export interface VideoUploadResponse {
   fps: number;
 }
 
+export interface TtsProviderStatus {
+  label: string;
+  requires_api_key: boolean;
+  configured: boolean;
+  cost: 'free' | 'paid';
+  model?: string;
+  base_url?: string;
+}
+
+export interface TtsStatus {
+  default_provider: 'edge' | 'openai' | 'elevenlabs';
+  default_voice: string;
+  warning: string | null;
+  providers: {
+    edge: TtsProviderStatus;
+    openai: TtsProviderStatus;
+    elevenlabs: TtsProviderStatus;
+  };
+}
+
+export interface HealthStatus {
+  status: string;
+  ffmpeg_installed: boolean;
+  ffmpeg_path: string | null;
+  app_version: string;
+  app_name?: string;
+  audience?: string;
+  error: string | null;
+  tts?: TtsStatus;
+}
+
 export interface VoiceOption {
   id: string;
   name: string;

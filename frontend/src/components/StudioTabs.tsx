@@ -59,7 +59,7 @@ export const StudioTabs: React.FC<StudioTabsProps> = ({
 
         <div className="hidden md:flex items-center gap-2 text-[11px] text-slate-400 font-medium">
           <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-          <span>Multi-Format Kids 3–5 Content Engine</span>
+          <span>Multi-Format Kids 5–8 Content Engine</span>
         </div>
       </div>
     </div>

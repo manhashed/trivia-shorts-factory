@@ -43,9 +43,9 @@ from backend.app.services.poem_job_manager import poem_job_manager
 from backend.app.utils.ffmpeg_check import get_ffmpeg_binary, probe_media_file
 
 app = FastAPI(
-    title="AI Kids Shorts Factory (Trivia & Singing Poem Studios)",
+    title=settings.app_name,
     version="2.0.0",
-    description="Automated pipeline for converting Trivia Q&As and Singing Mascot Poems into 9:16 vertical shorts.",
+    description="Automated pipeline for converting Trivia Q&As and singing mascot poems into 9:16 shorts for children ages 5–8.",
 )
 
 app.add_middleware(
@@ -73,7 +73,10 @@ def health_check():
         "ffmpeg_installed": ffmpeg_ok,
         "ffmpeg_path": ffmpeg_path,
         "app_version": settings.version,
+        "app_name": settings.app_name,
+        "audience": "ages 5-8",
         "error": error_msg,
+        "tts": settings.tts_status(),
     }
 
 

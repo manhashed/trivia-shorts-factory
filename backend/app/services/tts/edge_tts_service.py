@@ -20,14 +20,14 @@ class EdgeTTSProvider(BaseTTSProvider):
         "excited_host": {"rate": "+15%", "pitch": "+8Hz", "description": "Energetic game show host"},
         "gentle_storyteller": {"rate": "-5%", "pitch": "-3Hz", "description": "Calm bedtime narrator"},
         "game_show": {"rate": "+5%", "pitch": "+3Hz", "description": "Fun quiz show presenter"},
-        "cheerful_teacher": {"rate": "+0%", "pitch": "+5Hz", "description": "Enthusiastic preschool teacher"},
+        "cheerful_teacher": {"rate": "+0%", "pitch": "+5Hz", "description": "Enthusiastic classroom teacher"},
         "dramatic_reveal": {"rate": "-10%", "pitch": "+0Hz", "description": "Slow dramatic reveal"},
     }
 
     AVAILABLE_VOICES = [
         {
             "id": "en-US-AnaNeural",
-            "name": "Ana (Child / Cheerful - Recommended for 3-5)",
+            "name": "Ana (Child / Cheerful - Recommended for 5-8)",
             "gender": "Female (Child)",
             "locale": "en-US",
             "tags": ["kid-friendly", "cheerful", "playful"]
@@ -48,7 +48,7 @@ class EdgeTTSProvider(BaseTTSProvider):
         },
         {
             "id": "en-GB-SoniaNeural",
-            "name": "Sonia (British Preschool / Gentle)",
+            "name": "Sonia (British Classroom / Gentle)",
             "gender": "Female",
             "locale": "en-GB",
             "tags": ["educational", "storybook"]
