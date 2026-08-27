@@ -259,6 +259,7 @@ async def generate_single_preview(
     video_id: str = Form(...),
     config_json: str = Form(...),
     options_json: Optional[str] = Form(None),
+    correct_index: Optional[int] = Form(None),
 ):
     bg_video_path = UPLOADS_DIR / video_id
     if not bg_video_path.is_file():
@@ -297,6 +298,7 @@ async def generate_single_preview(
             work_dir=work_dir,
             config=config,
             options=options,
+            correct_index=correct_index,
             quality_tier="draft",
         )
 

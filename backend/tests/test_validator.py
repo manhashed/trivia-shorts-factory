@@ -43,6 +43,19 @@ def test_validate_trivia_json_missing_fields():
     assert "missing required fields: 'a'" in errors[0]["reason"]
     assert "missing required fields: 'q'" in errors[1]["reason"]
 
+def test_validate_trivia_json_forwards_correct_index():
+    sample_json = """
+    [
+        {"q": "What color is the sky?", "a": "Blue", "options": ["Red", "Blue", "Green"], "correct_index": 1}
+    ]
+    """
+    items, errors = validate_trivia_json(sample_json)
+    assert errors == []
+    assert len(items) == 1
+    assert items[0].correct_index == 1
+    assert items[0].resolved_answer == "Blue"
+
+
 def test_validate_trivia_json_empty_strings():
     sample_json = """
     [

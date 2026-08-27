@@ -73,3 +73,16 @@ settings = AppSettings()
 
 DRAFT_QUALITY = {"preset": "veryfast", "video_bitrate": "2500k"}
 FINAL_QUALITY = {"preset": "medium", "video_bitrate": "6000k"}
+
+
+def resolve_quality_profile(quality_tier: str) -> dict:
+    return DRAFT_QUALITY if quality_tier == "draft" else FINAL_QUALITY
+
+
+def resolve_encode_settings(quality_tier: str, config_bitrate: str) -> tuple[str, str]:
+    """Return (preset, video_bitrate). Draft uses the cheap profile bitrate;
+    final honors the caller-configured VideoRenderConfig.video_bitrate."""
+    profile = resolve_quality_profile(quality_tier)
+    preset = profile["preset"]
+    bitrate = profile["video_bitrate"] if quality_tier == "draft" else config_bitrate
+    return preset, bitrate

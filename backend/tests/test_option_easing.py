@@ -24,6 +24,18 @@ def test_overshoots_above_resting_position_then_settles():
     assert math.isclose(y_end, curr_opt_y, abs_tol=0.5)
 
 
+def test_entrance_is_continuous_at_delay_then_slides_in():
+    curr_opt_y = 960
+    delay_s = 0.26
+    y_before = compute_overshoot_y(curr_opt_y, delay_s, t=delay_s - 1e-6)
+    y_at = compute_overshoot_y(curr_opt_y, delay_s, t=delay_s)
+    y_mid = compute_overshoot_y(curr_opt_y, delay_s, t=delay_s + 0.12)
+    assert math.isclose(y_before, curr_opt_y + 600, abs_tol=0.5)
+    assert math.isclose(y_at, curr_opt_y + 600, abs_tol=0.5)
+    assert y_mid < y_at
+    assert y_mid > curr_opt_y - 30
+
+
 def test_stagger_produces_increasing_delays():
     delays = [0.1 + (i * 0.08) for i in range(4)]
     assert delays == sorted(delays)

@@ -1,14 +1,16 @@
 from backend.app.services.vfx_helpers import build_countdown_tick_pulse, build_flash_overlay
 
 
-def test_pulse_ring_uses_drawbox_with_alpha_oscillation():
+def test_pulse_ring_uses_visible_box_with_alpha_oscillation():
     result = build_countdown_tick_pulse(
         prior_layer="with_num_3", output_label="with_pulse_3",
         x=390, y_expr="980", tick_start=0.0, tick_end=1.0,
     )
-    assert "drawbox" in result
+    assert "box=1" in result
+    assert "boxcolor=white" in result
     assert "alpha='0.3+0.3*sin(2*PI*(t-0.0)*4)'" in result
     assert "enable='between(t,0.0,1.0)'" in result
+    assert "fontsize=1" not in result
     assert result.startswith("[with_num_3]")
     assert result.endswith("[with_pulse_3]")
 

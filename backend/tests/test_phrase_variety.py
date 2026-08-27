@@ -16,3 +16,9 @@ def test_answer_text_is_never_rephrased_or_mutated():
             phrase == template.format(answer=exact_answer)
             for template in REVEAL_PHRASE_TEMPLATES
         )
+
+
+def test_does_not_double_wrap_answers_that_already_reveal():
+    assert build_answer_reveal_phrase("The answer is 42") == "The answer is 42"
+    assert build_answer_reveal_phrase("It's a whale!") == "It's a whale!"
+    assert build_answer_reveal_phrase("It is Paris") == "It is Paris"

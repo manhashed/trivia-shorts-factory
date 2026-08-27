@@ -37,7 +37,8 @@ export const PreviewPlayer: React.FC<PreviewPlayerProps> = ({
         resolvedAnswer,
         videoData.video_id,
         config,
-        currentItem.options
+        currentItem.options,
+        currentItem.correct_index
       );
       setPreviewVideoUrl(res.video_url);
       setTiming(res.timing);

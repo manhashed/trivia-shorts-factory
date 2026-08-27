@@ -94,7 +94,8 @@ export async function generatePreview(
   answer: string,
   videoId: string,
   config: VideoRenderConfig,
-  options?: string[]
+  options?: string[],
+  correctIndex?: number
 ): Promise<{ preview_id: string; video_url: string; timing: Record<string, number> }> {
   const formData = new FormData();
   formData.append('question', question);
@@ -103,6 +104,7 @@ export async function generatePreview(
   formData.append('config_json', JSON.stringify(config));
   if (options && options.length > 0) {
     formData.append('options_json', JSON.stringify(options));
+    formData.append('correct_index', String(correctIndex ?? 0));
   }
 
   const res = await fetch(`${API_BASE}/preview`, {

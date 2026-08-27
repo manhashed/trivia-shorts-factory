@@ -72,3 +72,23 @@ def probe_media_file(file_path: Path) -> Dict[str, Any]:
         info["has_audio"] = True
 
     return info
+
+
+def convert_mp3_to_wav(temp_mp3: Path, output_path: Path) -> float:
+    """Transcode an mp3 (or any ffmpeg-readable audio file) to 44.1kHz stereo PCM WAV.
+    On ffmpeg failure, falls back to renaming the source into place so callers still
+    get a file to probe. Returns a clamped duration suitable for TTS timing.
+    """
+    ffmpeg_bin = get_ffmpeg_binary()
+    cmd = [
+        ffmpeg_bin, "-y", "-i", str(temp_mp3),
+        "-ar", "44100", "-ac", "2", "-c:a", "pcm_s16le", str(output_path),
+    ]
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if proc.returncode != 0 and temp_mp3.exists():
+        temp_mp3.rename(output_path)
+    elif temp_mp3.exists():
+        temp_mp3.unlink()
+
+    probe = probe_media_file(output_path)
+    return max(0.2, probe.get("duration", 0.0))

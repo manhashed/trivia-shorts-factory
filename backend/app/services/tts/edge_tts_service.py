@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Dict, Any
 import edge_tts
 from backend.app.services.tts.base import BaseTTSProvider
+from backend.app.services.phrase_variety import REVEAL_PHRASE_TEMPLATES
 from backend.app.utils.ffmpeg_check import probe_media_file, get_ffmpeg_binary
 import subprocess
 
@@ -118,17 +119,7 @@ class EdgeTTSProvider(BaseTTSProvider):
             actual_answer = re.sub(r"^The answer is\s*", "", actual_answer, flags=re.IGNORECASE)
             actual_answer = actual_answer.strip().rstrip('!.')
             
-            reveals = [
-                "The answer is... {answer}!",
-                "It's... {answer}! Great job!",
-                "Yes! It's {answer}!",
-                "That's right, it's {answer}!",
-                "Wow, it's {answer}! Did you know that?",
-                "You got it! It's {answer}!",
-                "Bingo! It's {answer}!",
-                "Correct! It is {answer}!"
-            ]
-            reveal = random.choice(reveals)
+            reveal = random.choice(REVEAL_PHRASE_TEMPLATES)
             return reveal.format(answer=actual_answer)
         return text
 

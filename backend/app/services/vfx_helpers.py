@@ -54,18 +54,18 @@ def compute_overshoot_y(
 ) -> float:
     """Pure Python mirror of the ffmpeg y_expr used for option-card entrance easing.
 
-    Mirrors exactly:
-        if(lt(t,delay_s),
-           curr_opt_y+600,
-           if(lt(t,delay_s+settle_dur),
-              curr_opt_y-overshoot_amount*sin(PI*(t-delay_s)/settle_dur)*exp(-3*(t-delay_s)),
-              curr_opt_y))
+    Slides up from 600px below rest over settle_dur (cubic ease) and subtracts a
+    sine overshoot so the card travels past rest then settles. Continuous at
+    t=delay_s (still off-screen) and t=delay_s+settle_dur (at rest).
     """
     if t < delay_s:
         return curr_opt_y + 600
     if t < delay_s + settle_dur:
-        dt = t - delay_s
-        return curr_opt_y - overshoot_amount * math.sin(math.pi * dt / settle_dur) * math.exp(-3 * dt)
+        p = min(1.0, (t - delay_s) / settle_dur)
+        remain = 1.0 - p
+        slide = 600.0 * remain * remain * remain
+        wobble = overshoot_amount * math.sin(math.pi * p)
+        return curr_opt_y + slide - wobble
     return curr_opt_y
 
 
@@ -76,12 +76,14 @@ def build_overshoot_y_expr(
     settle_dur: float = 0.35,
 ) -> str:
     """Build the ffmpeg-expression-language string matching compute_overshoot_y above.
-    Only uses ffmpeg-expression-safe primitives: if/lt/sin/exp/PI/+-*/.
+    Only uses ffmpeg-expression-safe primitives: if/lt/sin/min/PI/+-*/.
     """
+    p = f"min(1,(t-{delay_s})/{settle_dur})"
+    remain = f"(1-{p})"
     return (
         f"if(lt(t,{delay_s}),{curr_opt_y}+600,"
         f"if(lt(t,{delay_s}+{settle_dur}),"
-        f"{curr_opt_y}-{overshoot_amount}*sin(PI*(t-{delay_s})/{settle_dur})*exp(-3*(t-{delay_s})),"
+        f"{curr_opt_y}+600*{remain}*{remain}*{remain}-{overshoot_amount}*sin(PI*{p}),"
         f"{curr_opt_y}))"
     )
 
@@ -96,22 +98,19 @@ def build_countdown_tick_pulse(
     box_w: int = 260,
     box_h: int = 260,
 ) -> str:
-    """Build a semi-transparent white 'ring flash' drawbox behind a countdown
-    number, alpha-oscillating at 4Hz, gated to one tick's enable window.
+    """Build a semi-transparent white box behind a countdown number whose alpha
+    oscillates at 4Hz. drawtext's alpha applies to the box, unlike drawbox.
     """
-    # ffmpeg drawbox has no alpha option; chain drawtext so the tested
-    # alpha expression is valid and the box uses a visible midpoint opacity.
+    center_x = x + box_w // 2
+    border = max(box_w, box_h) // 2
     return (
-        f"[{prior_layer}]drawbox=x={x}:y='{y_expr}':w={box_w}:h={box_h}:"
-        f"color=white@0.45:t=fill:"
-        f"enable='between(t,{tick_start},{tick_end})',"
-        f"drawtext=text=' ':fontsize=1:x=0:y=0:"
+        f"[{prior_layer}]drawtext=text=' ':"
+        f"fontsize=2:fontcolor=white:"
+        f"x={center_x}:y='{y_expr}+{box_h // 2}':"
+        f"box=1:boxcolor=white:boxborderw={border}:"
         f"alpha='0.3+0.3*sin(2*PI*(t-{tick_start})*4)':"
         f"enable='between(t,{tick_start},{tick_end})'[{output_label}]"
     )
-
-
-_flash_src_counter = 0
 
 
 def build_flash_overlay(
@@ -126,9 +125,7 @@ def build_flash_overlay(
     then out, overlaid onto prior_layer at flash_time. Returns a list of
     filter_chains entries ready to append/extend into the caller's chain list.
     """
-    global _flash_src_counter
-    _flash_src_counter += 1
-    src_label = f"flash_src_{_flash_src_counter}"
+    src_label = f"{output_label}_src"
 
     src_chain = (
         f"color=c=white:s={width}x{height}:d={flash_dur},"

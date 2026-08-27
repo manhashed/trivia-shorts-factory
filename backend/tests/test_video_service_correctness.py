@@ -4,13 +4,12 @@ from backend.app.services.video_service import video_service
 
 
 def test_highlight_filters_contain_only_the_correct_option_text():
-    options = ["A Cow", "A Dog", "A Frog"]
     font_path = Path("/fake/Fredoka-Bold.ttf")
 
     filters, new_layer = video_service._build_option_highlight_filters(
         options_layer="with_opt_3",
-        options=options,
-        correct_index=0,
+        opt_display="A)  A Cow",
+        curr_opt_y=960,
         t_ans_start=5.25,
         font_path=font_path,
         input_layer_idx=99,
@@ -24,13 +23,12 @@ def test_highlight_filters_contain_only_the_correct_option_text():
 
 
 def test_highlight_filters_include_checkmark_green_box_and_correct_option_for_other_index():
-    options = ["A Cow", "A Dog", "A Frog"]
     font_path = Path("/fake/Fredoka-Bold.ttf")
 
     filters, new_layer = video_service._build_option_highlight_filters(
         options_layer="with_opt_3",
-        options=options,
-        correct_index=1,
+        opt_display="B)  A Dog",
+        curr_opt_y=1070,
         t_ans_start=5.25,
         font_path=font_path,
         input_layer_idx=42,

@@ -7,7 +7,11 @@ class TriviaItem(BaseModel):
     q: str = Field(..., min_length=1, description="Question text")
     a: str = Field(..., min_length=1, description="Answer text")
     category: Optional[str] = None
-    options: Optional[List[str]] = Field(default=None, description="Optional multiple-choice options (A, B, C)")
+    options: Optional[List[str]] = Field(
+        default=None,
+        max_length=4,
+        description="Optional multiple-choice options (A, B, C, D). At most 4 are rendered.",
+    )
     correct_index: Optional[int] = Field(default=None, description="Index into options that holds the correct answer")
 
     @field_validator("q", "a")
@@ -22,7 +26,9 @@ class TriviaItem(BaseModel):
     def validate_correct_index(self) -> "TriviaItem":
         if self.options:
             if self.correct_index is None:
-                self.correct_index = 0
+                lowered_a = self.a.strip().lower()
+                matches = [i for i, opt in enumerate(self.options) if opt.strip().lower() == lowered_a]
+                self.correct_index = matches[0] if len(matches) == 1 else 0
             elif not (0 <= self.correct_index < len(self.options)):
                 raise ValueError(
                     f"correct_index {self.correct_index} is out of range for options of length {len(self.options)}"

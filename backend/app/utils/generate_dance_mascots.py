@@ -14,6 +14,12 @@ def draw_musical_notes(d: ImageDraw.ImageDraw, x: int, y: int, color: tuple):
     d.line([(x + 4, y - 35), (x + 22, y - 30)], fill=color, width=5)
 
 
+def _draw_limb(d: ImageDraw.ImageDraw, body_cx: float, body_cy: float, dx: float, dy: float, amplitude: float, radius: float, fill: tuple) -> None:
+    cx = body_cx + dx * amplitude
+    cy = body_cy + dy * amplitude
+    d.ellipse([cx - radius, cy - radius, cx + radius, cy + radius], fill=fill)
+
+
 def _draw_pose_1_step_left(fur: tuple, inner: tuple, accent: tuple, amplitude: float = 1.0) -> Image.Image:
     """Pose 1: Step Left & Sing. Body/head fixed; left/right paw and the
     musical note displace from their body/nose anchor scaled by amplitude."""
@@ -33,10 +39,8 @@ def _draw_pose_1_step_left(fur: tuple, inner: tuple, accent: tuple, amplitude: f
     d.ellipse([235, 195, 255, 215], fill=(255, 182, 193))
     d.ellipse([235, 160, 255, 175], fill=(30, 41, 59))
 
-    left_cx, left_cy = body_cx + (-127.5) * amplitude, body_cy + (-122.5) * amplitude
-    d.ellipse([left_cx - 37.5, left_cy - 37.5, left_cx + 37.5, left_cy + 37.5], fill=fur)
-    right_cx, right_cy = body_cx + 132.5 * amplitude, body_cy + (-2.5) * amplitude
-    d.ellipse([right_cx - 37.5, right_cy - 37.5, right_cx + 37.5, right_cy + 37.5], fill=fur)
+    _draw_limb(d, body_cx, body_cy, -127.5, -122.5, amplitude, 37.5, fur)
+    _draw_limb(d, body_cx, body_cy, 132.5, -2.5, amplitude, 37.5, fur)
 
     note_x, note_y = nose_cx + (-165) * amplitude, nose_cy + (-17) * amplitude
     draw_musical_notes(d, int(note_x), int(note_y), accent)
@@ -62,10 +66,8 @@ def _draw_pose_2_head_high(fur: tuple, inner: tuple, accent: tuple, amplitude: f
     d.ellipse([230, 195, 280, 230], fill=(255, 182, 193))
     d.ellipse([245, 155, 265, 170], fill=(30, 41, 59))
 
-    left_cx, left_cy = body_cx + (-138.5) * amplitude, body_cy + (-112.5) * amplitude
-    d.ellipse([left_cx - 37.5, left_cy - 37.5, left_cx + 37.5, left_cy + 37.5], fill=fur)
-    right_cx, right_cy = body_cx + 136.5 * amplitude, body_cy + (-112.5) * amplitude
-    d.ellipse([right_cx - 37.5, right_cy - 37.5, right_cx + 37.5, right_cy + 37.5], fill=fur)
+    _draw_limb(d, body_cx, body_cy, -138.5, -112.5, amplitude, 37.5, fur)
+    _draw_limb(d, body_cx, body_cy, 136.5, -112.5, amplitude, 37.5, fur)
 
     note1_x, note1_y = nose_cx + (-175) * amplitude, nose_cy + (-32.5) * amplitude
     note2_x, note2_y = nose_cx + 145 * amplitude, nose_cy + (-32.5) * amplitude
@@ -93,10 +95,8 @@ def _draw_pose_3_step_right(fur: tuple, inner: tuple, accent: tuple, amplitude: 
     d.ellipse([255, 195, 275, 215], fill=(255, 182, 193))
     d.ellipse([255, 160, 275, 175], fill=(30, 41, 59))
 
-    left_cx, left_cy = body_cx + (-132.5) * amplitude, body_cy + (-2.5) * amplitude
-    d.ellipse([left_cx - 37.5, left_cy - 37.5, left_cx + 37.5, left_cy + 37.5], fill=fur)
-    right_cx, right_cy = body_cx + 127.5 * amplitude, body_cy + (-122.5) * amplitude
-    d.ellipse([right_cx - 37.5, right_cy - 37.5, right_cx + 37.5, right_cy + 37.5], fill=fur)
+    _draw_limb(d, body_cx, body_cy, -132.5, -2.5, amplitude, 37.5, fur)
+    _draw_limb(d, body_cx, body_cy, 127.5, -122.5, amplitude, 37.5, fur)
 
     note_x, note_y = nose_cx + 145 * amplitude, nose_cy + (-27.5) * amplitude
     draw_musical_notes(d, int(note_x), int(note_y), accent)
@@ -124,10 +124,8 @@ def _draw_pose_4_airborne_jump(fur: tuple, inner: tuple, accent: tuple, amplitud
     d.ellipse([230, 165, 280, 200], fill=(255, 182, 193))
     d.ellipse([245, 125, 265, 140], fill=(30, 41, 59))
 
-    left_cx, left_cy = body_cx + (-156) * amplitude, body_cy + (-130) * amplitude
-    d.ellipse([left_cx - 40, left_cy - 40, left_cx + 40, left_cy + 40], fill=fur)
-    right_cx, right_cy = body_cx + 154 * amplitude, body_cy + (-130) * amplitude
-    d.ellipse([right_cx - 40, right_cy - 40, right_cx + 40, right_cy + 40], fill=fur)
+    _draw_limb(d, body_cx, body_cy, -156, -130, amplitude, 40, fur)
+    _draw_limb(d, body_cx, body_cy, 154, -130, amplitude, 40, fur)
 
     star_offsets = [(-156, -50), (154, -50), (0, -100)]
     for dx, dy in star_offsets:

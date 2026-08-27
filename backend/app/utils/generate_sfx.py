@@ -96,15 +96,15 @@ def generate_celebration_chime(output_path: Path):
     total_samples = int(duration * sr)
     track = [(0.0, 0.0)] * total_samples
     freqs = [523.25, 659.25, 783.99, 1046.50]  # C5, E5, G5, C6
+    env_slow = [_note_envelope(i / sr, decay_rate=2.0) for i in range(total_samples)]
+    env_fast = [_note_envelope(i / sr, decay_rate=4.0) for i in range(total_samples)]
     for f in freqs:
         for detune in [0.0, 3.0]:
             for i in range(total_samples):
                 t = i / sr
-                env = _note_envelope(t, decay_rate=2.0)
+                env = env_slow[i]
                 val = math.sin(2.0 * math.pi * (f + detune) * t) * env * 0.1
-                # Bell-like overtone at 2x the fundamental: quieter, decays faster.
-                overtone_env = _note_envelope(t, decay_rate=4.0)
-                overtone = math.sin(2.0 * math.pi * (f + detune) * 2.0 * t) * overtone_env * 0.1 * 0.4
+                overtone = math.sin(2.0 * math.pi * (f + detune) * 2.0 * t) * env_fast[i] * 0.1 * 0.4
                 val += overtone
                 L, R = track[i]
                 if detune > 0:

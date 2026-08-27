@@ -82,13 +82,30 @@ def validate_trivia_json(raw_json_str: str) -> Tuple[List[TriviaItem], List[Dict
             if not options:
                 options = None
 
-        valid_items.append(TriviaItem(
-            id=item_id,
-            q=sanitized_q,
-            a=sanitized_a,
-            category=category,
-            options=options,
-        ))
+        correct_index = None
+        raw_correct_index = raw_item.get("correct_index", None)
+        if raw_correct_index is not None:
+            try:
+                correct_index = int(raw_correct_index)
+            except (TypeError, ValueError):
+                errors.append({
+                    "index": idx,
+                    "reason": f"Item #{idx + 1} has an invalid correct_index (must be an integer).",
+                })
+                continue
+
+        try:
+            valid_items.append(TriviaItem(
+                id=item_id,
+                q=sanitized_q,
+                a=sanitized_a,
+                category=category,
+                options=options,
+                correct_index=correct_index,
+            ))
+        except Exception as e:
+            errors.append({"index": idx, "reason": f"Item #{idx + 1} failed validation: {e}"})
+            continue
 
     return valid_items, errors
 

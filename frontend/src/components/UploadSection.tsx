@@ -245,7 +245,11 @@ export const UploadSection: React.FC<UploadSectionProps> = ({
                       ))}
                     </div>
                   )}
-                  <p className="text-emerald-400 font-semibold pt-0.5">Answer: {item.a}</p>
+                  <p className="text-emerald-400 font-semibold pt-0.5">
+                    Answer: {item.options && item.options.length > 0
+                      ? item.options[item.correct_index ?? 0]
+                      : item.a}
+                  </p>
                 </div>
               ))}
             </div>

@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 import textwrap
 
-from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, settings, DRAFT_QUALITY, FINAL_QUALITY
+from backend.app.config import FONTS_DIR, IMAGES_DIR, ASSETS_DIR, settings, resolve_encode_settings
 from backend.app.services.vfx_helpers import (
     build_cinematic_bg_filter,
     build_overshoot_y_expr,
@@ -107,8 +107,8 @@ class VideoService:
     def _build_option_highlight_filters(
         self,
         options_layer: str,
-        options: List[str],
-        correct_index: int,
+        opt_display: str,
+        curr_opt_y: int,
         t_ans_start: float,
         font_path,
         input_layer_idx: int,
@@ -117,24 +117,9 @@ class VideoService:
         Builds the filter_complex chain that restyles the correct multiple-choice
         option into a highlighted green box with a checkmark once the answer
         reveal begins. Returns (filter_chain_strings, new_current_layer_name).
-        The option's text is never altered -- only its box color, border, and an
-        adjacent checkmark are added, using the exact same display string already
-        rendered for that option during the question phase.
+        Uses the same display string and Y already computed by the options loop
+        so the highlight cannot drift if layout constants change.
         """
-        opt_labels = ["A", "B", "C", "D"]
-        base_opt_y = 960
-        opt_spacing = 110
-
-        opt_text = options[correct_index]
-        opt_letter = opt_labels[correct_index]
-        safe_opt = str(opt_text).replace("'", "").replace(":", "\\:").strip()
-        if safe_opt.upper().startswith(f"{opt_letter})") or safe_opt.upper().startswith(f"{opt_letter}:"):
-            opt_display = safe_opt
-        else:
-            opt_display = f"{opt_letter})  {safe_opt}"
-
-        curr_opt_y = base_opt_y + (correct_index * opt_spacing)
-
         filters: list[str] = []
         highlight_layer = f"with_opt_hl_{input_layer_idx}"
         check_layer = f"with_opt_check_{input_layer_idx}"
@@ -358,6 +343,7 @@ class VideoService:
             opt_labels = ["A", "B", "C", "D"]
             base_opt_y = 960
             opt_spacing = 110
+            rendered_options: List[Dict[str, Any]] = []
 
             for i, opt_text in enumerate(options[:4]):
                 opt_letter = opt_labels[i]
@@ -369,6 +355,7 @@ class VideoService:
                     opt_display = f"{opt_letter})  {safe_opt}"
 
                 curr_opt_y = base_opt_y + (i * opt_spacing)
+                rendered_options.append({"index": i, "opt_display": opt_display, "curr_opt_y": curr_opt_y})
                 if anim_style in ["slide", "bounce", "pop"]:
                     delay_s = 0.1 + (i * 0.08)
                     y_expr = build_overshoot_y_expr(curr_opt_y, delay_s)
@@ -390,11 +377,12 @@ class VideoService:
             # un-highlighted options simply vanish at t_ans_start (unchanged
             # behavior from the loop above) -- only the correct option is
             # restyled and kept visible during the reveal.
-            if correct_index is not None and 0 <= correct_index < len(options[:4]):
+            highlighted = next((row for row in rendered_options if row["index"] == correct_index), None)
+            if highlighted is not None:
                 highlight_filters, options_layer = self._build_option_highlight_filters(
                     options_layer=options_layer,
-                    options=options,
-                    correct_index=correct_index,
+                    opt_display=highlighted["opt_display"],
+                    curr_opt_y=highlighted["curr_opt_y"],
                     t_ans_start=t_ans_start,
                     font_path=font_path,
                     input_layer_idx=input_count,
@@ -482,17 +470,25 @@ class VideoService:
         filter_chains.append(
             f"[with_cd_flash][6:v]overlay=x=70:y='{a_card_y}':enable='gte(t,{t_ans_start})'[with_ans_frame]"
         )
-        # This renders the original free-text `answer_text` param (e.g. "A Big Spotted
-        # Cow!") purely as decorative flavor -- it is NEVER the authoritative answer.
-        # The authoritative, spoken-and-displayed answer is the highlighted option
-        # produced by _build_option_highlight_filters() in section (f) above.
+        if has_options:
+            # MC items: the highlighted option is authoritative. This card is
+            # decorative flavor using the original free-text `answer_text`.
+            ans_header = "FUN FACT"
+            ans_header_size = 34
+            ans_body_size = 32
+            ans_body_color = "white@0.75"
+        else:
+            ans_header = str(theme["ans_title"]).replace("'", "").replace(":", "\\:")
+            ans_header_size = 50
+            ans_body_size = 64
+            ans_body_color = "white"
         filter_chains.append(
-            f"[with_ans_frame]drawtext=fontfile='{font_path}':text='FUN FACT':fontcolor=0xFDE047:fontsize=34:"
+            f"[with_ans_frame]drawtext=fontfile='{font_path}':text='{ans_header}':fontcolor=0xFDE047:fontsize={ans_header_size}:"
             f"x=(w-text_w)/2:y='{a_hdr_y}':borderw=4:bordercolor=black@0.9:shadowcolor=black@0.9:shadowx=3:shadowy=3:enable='gte(t,{t_ans_start})'[with_ans_header]"
         )
         filter_chains.append(
             f"[with_ans_header]drawtext=fontfile='{font_path}':textfile='{escaped_a_file}':"
-            f"fontcolor=white@0.75:fontsize=32:x=(w-text_w)/2:y='{a_txt_y}':line_spacing=20:"
+            f"fontcolor={ans_body_color}:fontsize={ans_body_size}:x=(w-text_w)/2:y='{a_txt_y}':line_spacing=20:"
             f"borderw=6:bordercolor=black@0.95:shadowcolor=black@0.95:shadowx=4:shadowy=4:enable='gte(t,{t_ans_start})'[with_ans_text]"
         )
 
@@ -527,7 +523,7 @@ class VideoService:
 
         full_filter_complex = ";\n".join(filter_chains)
 
-        profile = DRAFT_QUALITY if quality_tier == "draft" else FINAL_QUALITY
+        preset, video_bitrate = resolve_encode_settings(quality_tier, config.video_bitrate)
 
         cmd = [
             ffmpeg_bin, "-y",
@@ -537,8 +533,8 @@ class VideoService:
             "-map", "1:a",
             "-t", str(total_duration),
             "-c:v", config.video_codec,
-            "-preset", profile["preset"],
-            "-b:v", profile["video_bitrate"],
+            "-preset", preset,
+            "-b:v", video_bitrate,
             "-pix_fmt", config.pix_fmt,
             "-r", str(config.fps),
             "-c:a", config.audio_codec,

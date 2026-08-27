@@ -1,9 +1,8 @@
 import httpx
-import subprocess
 from pathlib import Path
 from typing import List, Dict, Any
 from backend.app.services.tts.base import BaseTTSProvider
-from backend.app.utils.ffmpeg_check import probe_media_file, get_ffmpeg_binary
+from backend.app.utils.ffmpeg_check import convert_mp3_to_wav
 
 class OpenAITTSProvider(BaseTTSProvider):
     """
@@ -60,20 +59,7 @@ class OpenAITTSProvider(BaseTTSProvider):
             with open(temp_mp3, "wb") as f:
                 f.write(resp.content)
 
-        # Convert to WAV
-        ffmpeg_bin = get_ffmpeg_binary()
-        cmd = [
-            ffmpeg_bin, "-y", "-i", str(temp_mp3),
-            "-ar", "44100", "-ac", "2", "-c:a", "pcm_s16le", str(output_path)
-        ]
-        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if proc.returncode != 0 and temp_mp3.exists():
-            temp_mp3.rename(output_path)
-        elif temp_mp3.exists():
-            temp_mp3.unlink()
-
-        probe = probe_media_file(output_path)
-        return max(0.2, probe.get("duration", 0.0))
+        return convert_mp3_to_wav(temp_mp3, output_path)
 
     def list_voices(self) -> List[Dict[str, Any]]:
         return self.AVAILABLE_VOICES
