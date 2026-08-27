@@ -1,13 +1,41 @@
+# Local agent / editor
 .claude/
 .worktrees/
-venv/
-__pycache__/
-*.pyc
-.pytest_cache/
+.cursor/
+.idea/
+.vscode/
+*.swp
+.compound-engineering/config.local.yaml
 
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.tox/
+
+# Node
 node_modules/
 frontend/dist/
+frontend/.vite/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Runtime renders, uploads, and temp work
 storage/uploads/*
 storage/temp/*
 storage/outputs/*
@@ -15,6 +43,14 @@ storage/outputs/*
 !storage/temp/.gitkeep
 !storage/outputs/.gitkeep
 
-.env
-*.log
+# Local scratch at repo root
+/test.ass
+/test.vtt
+/test_ass.py
+/test_ass2.py
+/test_audio.mp3
+
+# OS / logs
 .DS_Store
+Thumbs.db
+*.log
